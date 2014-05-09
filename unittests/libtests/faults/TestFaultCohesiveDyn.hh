@@ -52,17 +52,16 @@ class pylith::faults::TestFaultCohesiveDyn: public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDyn );
 
   CPPUNIT_TEST( testConstructor );
-  CPPUNIT_TEST( testTractPerturbation );
+  CPPUNIT_TEST( testTractionPerturbation );
   CPPUNIT_TEST( testZeroTolerance );
   CPPUNIT_TEST( testOpenFreeSurf );
 
   // Tests in derived classes:
   // testInitialize()
-  // testConstrainSolnSpaceStick()
-  // testConstrainSolnSpaceSlip()
-  // testConstrainSolnSpaceOpen()
+  // testIntegrateResidualStick()
+  // testIntegrateResidualSlip()
+  // testIntegrateResidualOpen()
   // testUpdateStateVars()
-  // testCalcTractions()
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -71,7 +70,7 @@ protected:
 
   CohesiveDynData* _data; ///< Data for testing
   feassemble::Quadrature* _quadrature; ///< Fault quad.
-  TractPerturbation* _tractPerturbation; ///< Initial tractions.
+  TractionPerturbation* _tractionPerturbation; ///< Initial tractions.
   spatialdata::spatialdb::SpatialDB* _dbInitialTract; ///< Initial tractions.
   friction::FrictionModel* _friction; ///< Friction model
   spatialdata::spatialdb::SpatialDB* _dbFriction; ///< Friction parameters.
@@ -88,8 +87,8 @@ public:
   /// Test constructor.
   void testConstructor(void);
 
-  /// Test tractPerturbation().
-  void testTractPerturbation(void);
+  /// Test tractionPerturbation().
+  void testTractionPerturbation(void);
 
   /// Test zeroTolerance().
   void testZeroTolerance(void);
@@ -100,20 +99,17 @@ public:
   /// Test initialize().
   void testInitialize(void);
 
-  /// Test constrainSolnSpace() for sticking case.
-  void testConstrainSolnSpaceStick(void);
+  /// Test integrateResidual() for sticking case.
+  void testIntegrateResidualStick(void);
 
-  /// Test constrainSolnSpace() for slipping case.
-  void testConstrainSolnSpaceSlip(void);
+  /// Test integrateResidual() for slipping case.
+  void testIntegrateResidualSlip(void);
 
-  /// Test constrainSolnSpace for fault opening case().
-  void testConstrainSolnSpaceOpen(void);
+  /// Test integrateResidual for fault opening case().
+  void testIntegrateResidualOpen(void);
 
   /// Test updateStateVars().
   void testUpdateStateVars(void);
-
-  /// Test _calcTractions().
-  void testCalcTractions(void);
 
   // PRIVATE METHODS ////////////////////////////////////////////////////
 private:
@@ -125,8 +121,8 @@ private:
    * @param fields Solution fields.
    */
   void _initialize(topology::Mesh* const mesh,
-      FaultCohesiveDyn* const fault,
-      topology::SolutionFields* const fields);
+		   FaultCohesiveDyn* const fault,
+		   topology::SolutionFields* const fields);
 
   /** Set values for fields and Jacobian.
    *
@@ -141,11 +137,11 @@ private:
    * @param fieldIncrVals Values for solution increment field.
    */
   void _setFieldsJacobian(topology::Mesh* const mesh,
-      FaultCohesiveDyn* const fault,
-      topology::SolutionFields* const fields,
-      topology::Jacobian* const jacobian,
-      const PylithScalar* const fieldIncrVals);
-
+			  FaultCohesiveDyn* const fault,
+			  topology::SolutionFields* const fields,
+			  topology::Jacobian* const jacobian,
+			  const PylithScalar* const fieldIncrVals);
+  
   /** Determine if point is a Lagrange multiplier constraint point.
    *
    * @param point Label of point.

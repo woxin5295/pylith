@@ -131,12 +131,6 @@ namespace pylith {
        */
       void reformJacobianLumped(void);
 
-      /** Constrain solution space.
-       *
-       * @param tmpSolutionVec Temporary PETSc vector for solution.
-       */
-      void constrainSolnSpace(const PetscVec* tmpSolutionVec);
-
       /// Compute rate fields (velocity and/or acceleration) at time t.
       virtual
       void calcRateFields(void) = 0;

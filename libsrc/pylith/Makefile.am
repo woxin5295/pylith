@@ -56,7 +56,7 @@ libpylith_la_SOURCES = \
 	faults/BruneSlipFn.cc \
 	faults/TimeHistorySlipFn.cc \
 	faults/LiuCosSlipFn.cc \
-	faults/TractPerturbation.cc \
+	faults/TractionPerturbation.cc \
 	feassemble/CellGeometry.cc \
 	feassemble/Constraint.cc \
 	feassemble/GeometryLine2D.cc \

@@ -49,7 +49,7 @@ namespace pylith {
     class TimeHistorySlipFn;
 
     class Nucleator;
-    class TractPerturbation;
+    class TractionPerturbation;
 
     class TopologyOps;
   } // faults

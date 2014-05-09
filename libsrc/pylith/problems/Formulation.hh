@@ -149,12 +149,6 @@ public :
    */
   void reformJacobianLumped(void);
 
-  /** Constrain solution space.
-   *
-   * @param tmpSolutionVec Temporary PETSc vector for solution.
-   */
-  void constrainSolnSpace(const PetscVec* tmpSolutionVec);
-
   /** Adjust solution from solver with lumped Jacobian to match Lagrange
    *  multiplier constraints.
    */

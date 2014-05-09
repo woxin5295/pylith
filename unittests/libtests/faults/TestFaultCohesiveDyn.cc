@@ -21,7 +21,7 @@
 #include "TestFaultCohesiveDyn.hh" // Implementation of class methods
 
 #include "pylith/faults/FaultCohesiveDyn.hh" // USES FaultCohesiveDyn
-#include "pylith/faults/TractPerturbation.hh" // USES TractPerturbation
+#include "pylith/faults/TractionPerturbation.hh" // USES TractionPerturbation
 
 #include "data/CohesiveDynData.hh" // USES CohesiveDynData
 
@@ -55,7 +55,7 @@ pylith::faults::TestFaultCohesiveDyn::setUp(void)
 
   _data = 0;
   _quadrature = new feassemble::Quadrature();CPPUNIT_ASSERT(_quadrature);
-  _tractPerturbation = 0;
+  _tractionPerturbation = 0;
   _dbInitialTract = 0;
   _friction = 0;
   _dbFriction = 0;
@@ -72,7 +72,7 @@ pylith::faults::TestFaultCohesiveDyn::tearDown(void)
 
   delete _data; _data = 0;
   delete _quadrature; _quadrature = 0;
-  delete _tractPerturbation; _tractPerturbation = 0;
+  delete _tractionPerturbation; _tractionPerturbation = 0;
   delete _dbInitialTract; _dbInitialTract = 0;
   delete _friction; _friction = 0;
   delete _dbFriction; _dbFriction = 0;
@@ -93,22 +93,22 @@ pylith::faults::TestFaultCohesiveDyn::testConstructor(void)
 } // testConstructor
 
 // ----------------------------------------------------------------------
-// Test tractPerturbation().
+// Test tractionPerturbation().
 void
-pylith::faults::TestFaultCohesiveDyn::testTractPerturbation(void)
-{ // testTractPerturbation
+pylith::faults::TestFaultCohesiveDyn::testTractionPerturbation(void)
+{ // testTractionPerturbation
   PYLITH_METHOD_BEGIN;
 
   FaultCohesiveDyn fault;
 
   const std::string& label = "test database";
-  TractPerturbation tract;
+  TractionPerturbation tract;
   tract.label(label.c_str());
-  fault.tractPerturbation(&tract);
-  CPPUNIT_ASSERT(fault._tractPerturbation);
+  fault.tractionPerturbation(&tract);
+  CPPUNIT_ASSERT(fault._tractionPerturbation);
 
   PYLITH_METHOD_END;
-} // testTractPerturbation
+} // testTractionPerturbation
 
 // ----------------------------------------------------------------------
 // Test zeroTolerance().
@@ -195,7 +195,7 @@ pylith::faults::TestFaultCohesiveDyn::testInitialize(void)
   } // for
 
   // Prescribed traction perturbation
-  if (fault._tractPerturbation) {
+  if (fault._tractionPerturbation) {
     // :KLUDGE: Only check initial value
     topology::VecVisitorMesh tractionVisitor(fault.vertexField("traction_initial_value"));
     const PetscScalar* tractionArray = tractionVisitor.localArray();CPPUNIT_ASSERT(tractionArray);
@@ -216,10 +216,10 @@ pylith::faults::TestFaultCohesiveDyn::testInitialize(void)
 } // testInitialize
 
 // ----------------------------------------------------------------------
-// Test constrainSolnSpace() for sticking case.
+// Test integrateResidual() for sticking case.
 void
-pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceStick(void)
-{ // testConstrainSolnSpaceStick
+pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualStick(void)
+{ // testIntegrateResidualStick
   PYLITH_METHOD_BEGIN;
 
   assert(_data);
@@ -236,7 +236,9 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceStick(void)
   const PylithScalar t = 2.134 / _data->timeScale;
   const PylithScalar dt = 0.01 / _data->timeScale;
   fault.timeStep(dt);
-  fault.constrainSolnSpace(&fields, t, jacobian);
+
+  const topology::Field& residual = fields.get("residual");
+  fault.integrateResidual(residual, t, &fields);
   
   topology::Field& solution = fields.solution();
   const topology::Field& dispIncrAdj = fields.get("dispIncr adjust");
@@ -302,13 +304,13 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceStick(void)
   } // Check slip values
 
   PYLITH_METHOD_END;
-} // testConstrainSolnSpaceStick
+} // testIntegrateResidualStick
 
 // ----------------------------------------------------------------------
-// Test constrainSolnSpace() for slipping case.
+// Test integrateResidual() for slipping case.
 void
-pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceSlip(void)
-{ // testConstrainSolnSpaceSlip
+pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualSlip(void)
+{ // testIntegrateResidualSlip
   PYLITH_METHOD_BEGIN;
 
   assert(_data);
@@ -325,7 +327,9 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceSlip(void)
   const PylithScalar t = 2.134 / _data->timeScale;
   const PylithScalar dt = 0.01 / _data->timeScale;
   fault.timeStep(dt);
-  fault.constrainSolnSpace(&fields, t, jacobian);
+
+  const topology::Field& residual = fields.get("residual");
+  fault.integrateResidual(residual, t, &fields);
 
   topology::Field& solution = fields.solution();
   const topology::Field& dispIncrAdj = fields.get("dispIncr adjust");
@@ -394,13 +398,13 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceSlip(void)
   } // Check slip values
 
   PYLITH_METHOD_END;
-} // testConstrainSolnSpaceSlip
+} // testIntegrateResidualSlip
 
 // ----------------------------------------------------------------------
-// Test constrainSolnSpace() for opening case.
+// Test integrateResidual() for opening case.
 void
-pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceOpen(void)
-{ // testConstrainSolnSpaceOpen
+pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualOpen(void)
+{ // testIntegrateResidualOpen
   PYLITH_METHOD_BEGIN;
 
   assert(_data);
@@ -417,7 +421,9 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceOpen(void)
   const PylithScalar t = 2.134 / _data->timeScale;
   const PylithScalar dt = 0.01 / _data->timeScale;
   fault.timeStep(dt);
-  fault.constrainSolnSpace(&fields, t, jacobian);
+
+  const topology::Field& residual = fields.get("residual");
+  fault.integrateResidual(residual, t, &fields);
 
   topology::Field& solution = fields.solution();
   const topology::Field& dispIncrAdj = fields.get("dispIncr adjust");
@@ -486,7 +492,7 @@ pylith::faults::TestFaultCohesiveDyn::testConstrainSolnSpaceOpen(void)
   } // Check slip values
 
   PYLITH_METHOD_END;
-} // testConstrainSolnSpaceOpen
+} // testIntegrateResidualOpen
 
 // ----------------------------------------------------------------------
 // Test updateStateVars().
@@ -516,75 +522,6 @@ pylith::faults::TestFaultCohesiveDyn::testUpdateStateVars(void)
 
   PYLITH_METHOD_END;
 } // testUpdateStateVars
-
-// ----------------------------------------------------------------------
-// Test calcTractions().
-void
-pylith::faults::TestFaultCohesiveDyn::testCalcTractions(void)
-{ // testCalcTractions
-  PYLITH_METHOD_BEGIN;
-
-  CPPUNIT_ASSERT(_data);
-
-  topology::Mesh mesh;
-  FaultCohesiveDyn fault;
-  topology::SolutionFields fields(mesh);
-  _initialize(&mesh, &fault, &fields);
-  topology::Jacobian jacobian(fields.solution());
-  _setFieldsJacobian(&mesh, &fault, &fields, &jacobian, _data->fieldIncrStick);
-
-  const int spaceDim = _data->spaceDim;
-  topology::Field tractions(*fault._faultMesh);
-  tractions.newSection(topology::FieldBase::VERTICES_FIELD, spaceDim);
-  tractions.allocate();
-  tractions.zero();
-
-  const PylithScalar t = 0;
-  fault.updateStateVars(t, &fields);
-  fault._calcTractions(&tractions, fields.get("disp(t)"));
-
-  topology::VecVisitorMesh tractionVisitor(tractions);
-  const PetscScalar* tractionArray = tractionVisitor.localArray();CPPUNIT_ASSERT(tractionArray);
-
-  topology::VecVisitorMesh dispVisitor(fields.get("disp(t)"));
-  const PetscScalar* dispArray = dispVisitor.localArray();CPPUNIT_ASSERT(dispArray);
-
-  const int numConstraintEdges = _data->numConstraintEdges;
-  CPPUNIT_ASSERT_EQUAL(numConstraintEdges, int(fault._cohesiveVertices.size()));
-  int_array constraintEdgesSorted(_data->constraintEdges, numConstraintEdges);
-  int* sortedBegin = &constraintEdgesSorted[0];
-  int* sortedEnd = &constraintEdgesSorted[numConstraintEdges];
-  std::sort(sortedBegin, sortedEnd);
-  for (int i=0; i < numConstraintEdges; ++i) {
-    const int* iter = std::lower_bound(sortedBegin, sortedEnd, fault._cohesiveVertices[i].lagrange);
-    CPPUNIT_ASSERT(iter != sortedEnd);
-    const int index = iter - sortedBegin;
-
-    const PetscInt v_fault = fault._cohesiveVertices[i].fault;
-    const PetscInt e_lagrange = fault._cohesiveVertices[i].lagrange;
-
-    const PetscInt toff = tractionVisitor.sectionOffset(v_fault);
-    CPPUNIT_ASSERT_EQUAL(spaceDim, tractionVisitor.sectionDof(v_fault));
-
-    const PetscInt doff = dispVisitor.sectionOffset(e_lagrange);
-    CPPUNIT_ASSERT_EQUAL(spaceDim, dispVisitor.sectionDof(e_lagrange));
-      
-    const PylithScalar* orientationVertex = &_data->orientation[index*spaceDim*spaceDim];
-
-    const PylithScalar tolerance = 1.0e-06;
-    for(PetscInt d = 0; d < spaceDim; ++d) {
-      PylithScalar tractionE = 0.0;
-      for(PetscInt e = 0; e < spaceDim; ++e)
-	tractionE += orientationVertex[d*spaceDim+e] * dispArray[doff+e];
-      if (tractionE > 1.0) 
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, tractionArray[toff+d]/tractionE, tolerance);
-      else
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(tractionE, tractionArray[toff+d], tolerance);
-    } // for
-  } // for
-
-  PYLITH_METHOD_END;
-} // testCalcTractions
 
 // ----------------------------------------------------------------------
 // Initialize FaultCohesiveDyn interface condition.
@@ -628,15 +565,15 @@ pylith::faults::TestFaultCohesiveDyn::_initialize(topology::Mesh* const mesh,
 			  _data->spaceDim);
   
   // Setup prescribed traction perturbation
-  delete _tractPerturbation; _tractPerturbation = new TractPerturbation();CPPUNIT_ASSERT(_tractPerturbation);
-  _tractPerturbation->label("traction perturbation");
+  delete _tractionPerturbation; _tractionPerturbation = new TractionPerturbation();CPPUNIT_ASSERT(_tractionPerturbation);
+  _tractionPerturbation->label("traction perturbation");
   spatialdata::spatialdb::SimpleDB* db = new spatialdata::spatialdb::SimpleDB("initial tractions");CPPUNIT_ASSERT(db);
   spatialdata::spatialdb::SimpleIOAscii ioInitialTract;
   ioInitialTract.filename(_data->initialTractFilename);
   db->ioHandler(&ioInitialTract);
   delete _dbInitialTract; _dbInitialTract = db;
-  _tractPerturbation->dbInitial(db);
-  fault->tractPerturbation(_tractPerturbation);
+  _tractionPerturbation->dbInitial(db);
+  fault->tractionPerturbation(_tractionPerturbation);
 
   // Setup friction
   spatialdata::spatialdb::SimpleDB* dbFriction = new spatialdata::spatialdb::SimpleDB("static friction");CPPUNIT_ASSERT(dbFriction);

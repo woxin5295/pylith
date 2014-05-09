@@ -306,49 +306,6 @@ pylith::problems::Formulation::reformJacobianLumped(void)
 } // reformJacobianLumped
 
 // ----------------------------------------------------------------------
-// Constrain solution space.
-void
-pylith::problems::Formulation::constrainSolnSpace(const PetscVec* tmpSolutionVec)
-{ // constrainSolnSpace
-  PYLITH_METHOD_BEGIN;
-
-  assert(tmpSolutionVec);
-  assert(_fields);
-
-  topology::Field& solution = _fields->solution();
-
-  if (!_fields->hasField("dispIncr adjust")) {
-    _fields->add("dispIncr adjust", "dispIncr_adjust");
-    topology::Field& adjust = _fields->get("dispIncr adjust");
-    adjust.cloneSection(solution);
-  } // for
-  topology::Field& adjust = _fields->get("dispIncr adjust");
-  adjust.zeroAll();
-
-  // Update section view of field.
-  if (tmpSolutionVec) {
-    solution.scatterGlobalToLocal(*tmpSolutionVec);
-  } // if
-
-  const int numIntegrators = _integrators.size();
-  assert(numIntegrators > 0); // must have at least 1 bulk integrator
-  for (int i=0; i < numIntegrators; ++i) {
-    _integrators[i]->timeStep(_dt);
-    _integrators[i]->constrainSolnSpace(_fields, _t, *_jacobian);
-  } // for
-
-  adjust.complete();
-  solution += adjust;  
-
-  // Update PETScVec of solution for changes to Lagrange multipliers.
-  if (tmpSolutionVec) {
-    solution.scatterLocalToGlobal(*tmpSolutionVec);
-  } // if
-
-  PYLITH_METHOD_END;
-} // constrainSolnSpace
-
-// ----------------------------------------------------------------------
 // Adjust solution from solver with lumped Jacobian to match Lagrange
 //  multiplier constraints.
 void

@@ -17,17 +17,17 @@
 //
 
 /**
- * @file unittests/libtests/faults/TestTractPerturbation.hh
+ * @file unittests/libtests/faults/TestTractionPerturbation.hh
  *
- * @brief C++ TestTractPerturbation object
+ * @brief C++ TestTractionPerturbation object
  *
- * C++ unit testing for TractPerturbation.
+ * C++ unit testing for TractionPerturbation.
  */
 
-#if !defined(pylith_faults_testtractperturbation_hh)
-#define pylith_faults_testtractperturbation_hh
+#if !defined(pylith_faults_testtractionperturbation_hh)
+#define pylith_faults_testtractionperturbation_hh
 
-#include "pylith/faults/faultsfwd.hh" // USES TractPerturbation
+#include "pylith/faults/faultsfwd.hh" // USES TractionPerturbation
 #include "pylith/topology/topologyfwd.hh" // USES Mesh
 
 #include <cppunit/extensions/HelperMacros.h>
@@ -35,16 +35,16 @@
 /// Namespace for pylith package
 namespace pylith {
   namespace faults {
-    class TestTractPerturbation;
+    class TestTractionPerturbation;
   } // faults
 } // pylith
 
-/// C++ unit testing for TractPerturbation
-class pylith::faults::TestTractPerturbation : public CppUnit::TestFixture
-{ // class TestTractPerturbation
+/// C++ unit testing for TractionPerturbation
+class pylith::faults::TestTractionPerturbation : public CppUnit::TestFixture
+{ // class TestTractionPerturbation
 
   // CPPUNIT TEST SUITE /////////////////////////////////////////////////
-  CPPUNIT_TEST_SUITE( TestTractPerturbation );
+  CPPUNIT_TEST_SUITE( TestTractionPerturbation );
 
   CPPUNIT_TEST( testConstructor );
   CPPUNIT_TEST( testLabel );
@@ -83,7 +83,7 @@ public :
   // PRIVATE METHODS ////////////////////////////////////////////////////
 private :
 
-  /** Initialize TractPerturbation.
+  /** Initialize TractionPerturbation.
    *
    * @param mesh Finite-element mesh of domain.
    * @param faultMesh Finite-element mesh of fault.
@@ -92,11 +92,11 @@ private :
   static
   void _initialize(topology::Mesh* mesh,
 		   topology::Mesh* faultMesh,
-		   TractPerturbation* tract);
+		   TractionPerturbation* tract);
 
-}; // class TestTractPerturbation
+}; // class TestTractionPerturbation
 
-#endif // pylith_faults_testtractperturbation_hh
+#endif // pylith_faults_testtractionperturbation_hh
 
 
 // End of file 

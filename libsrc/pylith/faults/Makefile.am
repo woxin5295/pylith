@@ -33,7 +33,7 @@ subpkginclude_HEADERS = \
 	StepSlipFn.icc \
 	TimeHistorySlipFn.hh \
 	TimeHistorySlipFn.icc \
-	TractPerturbation.hh \
+	TractionPerturbation.hh \
 	Fault.hh \
 	Fault.icc \
 	FaultCohesive.hh \

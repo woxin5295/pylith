@@ -49,11 +49,10 @@ class pylith::faults::TestFaultCohesiveDynTri3 : public TestFaultCohesiveDyn
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDynTri3 );
 
   CPPUNIT_TEST( testInitialize );
-  CPPUNIT_TEST( testConstrainSolnSpaceStick );
-  CPPUNIT_TEST( testConstrainSolnSpaceSlip );
-  CPPUNIT_TEST( testConstrainSolnSpaceOpen );
+  CPPUNIT_TEST( testIntegrateResidualStick );
+  CPPUNIT_TEST( testIntegrateResidualSlip );
+  CPPUNIT_TEST( testIntegrateResidualOpen );
   CPPUNIT_TEST( testUpdateStateVars );
-  CPPUNIT_TEST( testCalcTractions );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -75,11 +74,10 @@ class pylith::faults::TestFaultCohesiveDynTri3d : public TestFaultCohesiveDyn
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDynTri3d );
 
   CPPUNIT_TEST( testInitialize );
-  CPPUNIT_TEST( testConstrainSolnSpaceStick );
-  CPPUNIT_TEST( testConstrainSolnSpaceSlip );
-  CPPUNIT_TEST( testConstrainSolnSpaceOpen );
+  CPPUNIT_TEST( testIntegrateResidualStick );
+  CPPUNIT_TEST( testIntegrateResidualSlip );
+  CPPUNIT_TEST( testIntegrateResidualOpen );
   CPPUNIT_TEST( testUpdateStateVars );
-  CPPUNIT_TEST( testCalcTractions );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -101,11 +99,10 @@ class pylith::faults::TestFaultCohesiveDynQuad4 : public TestFaultCohesiveDyn
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDynQuad4 );
 
   CPPUNIT_TEST( testInitialize );
-  CPPUNIT_TEST( testConstrainSolnSpaceStick );
-  CPPUNIT_TEST( testConstrainSolnSpaceSlip );
-  CPPUNIT_TEST( testConstrainSolnSpaceOpen );
+  CPPUNIT_TEST( testIntegrateResidualStick );
+  CPPUNIT_TEST( testIntegrateResidualSlip );
+  CPPUNIT_TEST( testIntegrateResidualOpen );
   CPPUNIT_TEST( testUpdateStateVars );
-  CPPUNIT_TEST( testCalcTractions );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -127,11 +124,10 @@ class pylith::faults::TestFaultCohesiveDynTet4 : public TestFaultCohesiveDyn
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDynTet4 );
 
   CPPUNIT_TEST( testInitialize );
-  CPPUNIT_TEST( testConstrainSolnSpaceStick );
-  CPPUNIT_TEST( testConstrainSolnSpaceSlip );
-  CPPUNIT_TEST( testConstrainSolnSpaceOpen );
+  CPPUNIT_TEST( testIntegrateResidualStick );
+  CPPUNIT_TEST( testIntegrateResidualSlip );
+  CPPUNIT_TEST( testIntegrateResidualOpen );
   CPPUNIT_TEST( testUpdateStateVars );
-  CPPUNIT_TEST( testCalcTractions );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -153,11 +149,10 @@ class pylith::faults::TestFaultCohesiveDynHex8 : public TestFaultCohesiveDyn
   CPPUNIT_TEST_SUITE( TestFaultCohesiveDynHex8 );
 
   CPPUNIT_TEST( testInitialize );
-  CPPUNIT_TEST( testConstrainSolnSpaceStick );
-  CPPUNIT_TEST( testConstrainSolnSpaceSlip );
-  CPPUNIT_TEST( testConstrainSolnSpaceOpen );
+  CPPUNIT_TEST( testIntegrateResidualStick );
+  CPPUNIT_TEST( testIntegrateResidualSlip );
+  CPPUNIT_TEST( testIntegrateResidualOpen );
   CPPUNIT_TEST( testUpdateStateVars );
-  CPPUNIT_TEST( testCalcTractions );
 
   CPPUNIT_TEST_SUITE_END();
 

@@ -178,9 +178,6 @@ pylith::problems::SolverNonlinear::reformResidual(PetscSNES snes,
   Formulation* formulation = (Formulation*) context;
   assert(formulation);
 
-  // Make sure we have an admissible Lagrange multiplier (\lambda)
-  formulation->constrainSolnSpace(&tmpSolutionVec);
-
   // Reform residual
   formulation->reformResidual(&tmpResidualVec, &tmpSolutionVec);
 

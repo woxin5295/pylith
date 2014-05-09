@@ -18,7 +18,7 @@
 
 #include <portinfo>
 
-#include "TractPerturbation.hh" // implementation of object methods
+#include "TractionPerturbation.hh" // implementation of object methods
 
 #include "FaultCohesiveLagrange.hh" // USES faultToGlobal()
 
@@ -41,7 +41,7 @@
 
 // ----------------------------------------------------------------------
 // Default constructor.
-pylith::faults::TractPerturbation::TractPerturbation(void) :
+pylith::faults::TractionPerturbation::TractionPerturbation(void) :
   _parameters(0),
   _timeScale(1.0)
 { // constructor
@@ -49,7 +49,7 @@ pylith::faults::TractPerturbation::TractPerturbation(void) :
 
 // ----------------------------------------------------------------------
 // Destructor.
-pylith::faults::TractPerturbation::~TractPerturbation(void)
+pylith::faults::TractionPerturbation::~TractionPerturbation(void)
 { // destructor
   deallocate();
 } // destructor
@@ -57,7 +57,7 @@ pylith::faults::TractPerturbation::~TractPerturbation(void)
 // ----------------------------------------------------------------------
 // Deallocate PETSc and local data structures.
 void 
-pylith::faults::TractPerturbation::deallocate(void)
+pylith::faults::TractionPerturbation::deallocate(void)
 { // deallocate
   PYLITH_METHOD_BEGIN;
 
@@ -71,7 +71,7 @@ pylith::faults::TractPerturbation::deallocate(void)
 // ----------------------------------------------------------------------
 // Set label for traction perturbation.
 void
-pylith::faults::TractPerturbation::label(const char* value)
+pylith::faults::TractionPerturbation::label(const char* value)
 { // label
   _label = value;
 } // label
@@ -79,7 +79,7 @@ pylith::faults::TractPerturbation::label(const char* value)
 // ----------------------------------------------------------------------
 // Get parameter fields.
 const pylith::topology::Fields*
-pylith::faults::TractPerturbation::parameterFields(void) const
+pylith::faults::TractionPerturbation::parameterFields(void) const
 { // parameterFields
   return _parameters;
 } // parameterFields
@@ -87,7 +87,7 @@ pylith::faults::TractPerturbation::parameterFields(void) const
 // ----------------------------------------------------------------------
 // Initialize traction perturbation function.
 void
-pylith::faults::TractPerturbation::initialize(const topology::Mesh& faultMesh,
+pylith::faults::TractionPerturbation::initialize(const topology::Mesh& faultMesh,
 					      const topology::Field& faultOrientation, 
 					      const spatialdata::units::Nondimensional& normalizer)
 { // initialize
@@ -164,7 +164,7 @@ pylith::faults::TractPerturbation::initialize(const topology::Mesh& faultMesh,
       } // case 3
       default :
         std::ostringstream msg;
-        msg << "Bad spatial dimension '" << spaceDim << " in TractPerturbation'." << std::endl;
+        msg << "Bad spatial dimension '" << spaceDim << " in TractionPerturbation'." << std::endl;
         throw std::logic_error(msg.str());
       } // switch
     _queryDB("initial", _dbInitial, spaceDim, pressureScale, normalizer);
@@ -197,7 +197,7 @@ pylith::faults::TractPerturbation::initialize(const topology::Mesh& faultMesh,
       } // case 3
       default :
         std::ostringstream msg;
-        msg << "Bad spatial dimension '" << spaceDim << " in TractPerturbation'." << std::endl;
+        msg << "Bad spatial dimension '" << spaceDim << " in TractionPerturbation'." << std::endl;
         throw std::logic_error(msg.str());
       } // switch
     _queryDB("rate", _dbRate, spaceDim, rateScale, normalizer);
@@ -233,7 +233,7 @@ pylith::faults::TractPerturbation::initialize(const topology::Mesh& faultMesh,
       } // case 3
       default :
         std::ostringstream msg;
-        msg << "Bad spatial dimension '" << spaceDim << " in TractPerturbation'." << std::endl;
+        msg << "Bad spatial dimension '" << spaceDim << " in TractionPerturbation'." << std::endl;
         throw std::logic_error(msg.str());
       } // switch
     _queryDB("change", _dbChange, spaceDim, pressureScale, normalizer);
@@ -255,7 +255,7 @@ pylith::faults::TractPerturbation::initialize(const topology::Mesh& faultMesh,
 // ----------------------------------------------------------------------
 // Calculate temporal and spatial variation of value over the list of Submesh.
 void
-pylith::faults::TractPerturbation::calculate(const PylithScalar t)
+pylith::faults::TractionPerturbation::calculate(const PylithScalar t)
 { // calculate
   PYLITH_METHOD_BEGIN;
 
@@ -371,7 +371,7 @@ pylith::faults::TractPerturbation::calculate(const PylithScalar t)
 // ----------------------------------------------------------------------
 // Determine if perturbation has a given parameter.
 bool
-pylith::faults::TractPerturbation::hasParameter(const char* name) const
+pylith::faults::TractionPerturbation::hasParameter(const char* name) const
 { // hasParameter
   if (0 == strcasecmp(name, "traction_initial_value"))
     return (0 != _dbInitial);
@@ -390,7 +390,7 @@ pylith::faults::TractPerturbation::hasParameter(const char* name) const
 // ----------------------------------------------------------------------
 // Get vertex field with traction perturbation information.
 const pylith::topology::Field&
-pylith::faults::TractPerturbation::vertexField(const char* name,
+pylith::faults::TractionPerturbation::vertexField(const char* name,
 					       const topology::SolutionFields* const fields)
 { // vertexField
   PYLITH_METHOD_BEGIN;
@@ -426,7 +426,7 @@ pylith::faults::TractPerturbation::vertexField(const char* name,
 // ----------------------------------------------------------------------
 // Get label of boundary condition surface.
 const char*
-pylith::faults::TractPerturbation::_getLabel(void) const
+pylith::faults::TractionPerturbation::_getLabel(void) const
 { // _getLabel
   return _label.c_str();
 } // _getLabel
@@ -434,11 +434,11 @@ pylith::faults::TractPerturbation::_getLabel(void) const
 // ----------------------------------------------------------------------
 // Query database for values.
 void
-pylith::faults::TractPerturbation::_queryDB(const char* name,
-					    spatialdata::spatialdb::SpatialDB* const db,
-					    const int querySize,
-					    const PylithScalar scale,
-					    const spatialdata::units::Nondimensional& normalizer)
+pylith::faults::TractionPerturbation::_queryDB(const char* name,
+					       spatialdata::spatialdb::SpatialDB* const db,
+					       const int querySize,
+					       const PylithScalar scale,
+					       const spatialdata::units::Nondimensional& normalizer)
 { // _queryDB
   PYLITH_METHOD_BEGIN;
 

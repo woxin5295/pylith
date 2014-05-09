@@ -18,9 +18,9 @@
 
 #include <portinfo>
 
-#include "TestTractPerturbation.hh" // Implementation of class methods
+#include "TestTractionPerturbation.hh" // Implementation of class methods
 
-#include "pylith/faults/TractPerturbation.hh" // USES TractPerturbation
+#include "pylith/faults/TractionPerturbation.hh" // USES TractionPerturbation
 
 #include "TestFaultMesh.hh" // USES createFaultMesh()
 
@@ -39,18 +39,18 @@
 #include "spatialdata/units/Nondimensional.hh" // USES Nondimensional
 
 // ----------------------------------------------------------------------
-CPPUNIT_TEST_SUITE_REGISTRATION( pylith::faults::TestTractPerturbation );
+CPPUNIT_TEST_SUITE_REGISTRATION( pylith::faults::TestTractionPerturbation );
 
 // ----------------------------------------------------------------------
 namespace pylith {
   namespace faults {
-    namespace _TestTractPerturbation {
+    namespace _TestTractionPerturbation {
       const PylithScalar lengthScale = 1.0e+3;
       const PylithScalar pressureScale = 2.25e+10;
       const PylithScalar timeScale = 0.5;
       const PylithScalar velocityScale = lengthScale / timeScale;
       const PylithScalar densityScale = pressureScale / (velocityScale*velocityScale);
-    } // namespace _TestTractPerturbation
+    } // namespace _TestTractionPerturbation
   } // faults
 } // pylith
 
@@ -58,11 +58,11 @@ namespace pylith {
 // ----------------------------------------------------------------------
 // Test constructor.
 void
-pylith::faults::TestTractPerturbation::testConstructor(void)
+pylith::faults::TestTractionPerturbation::testConstructor(void)
 { // testConstructor
   PYLITH_METHOD_BEGIN;
 
-  TractPerturbation eqsrc;
+  TractionPerturbation eqsrc;
 
   PYLITH_METHOD_END;
 } // testConstructor
@@ -70,13 +70,13 @@ pylith::faults::TestTractPerturbation::testConstructor(void)
 // ----------------------------------------------------------------------
 // Test label().
 void
-pylith::faults::TestTractPerturbation::testLabel(void)
+pylith::faults::TestTractionPerturbation::testLabel(void)
 { // testLabel
   PYLITH_METHOD_BEGIN;
 
   const std::string& label = "nucleation";
 
-  TractPerturbation tract;
+  TractionPerturbation tract;
   tract.label(label.c_str());
   CPPUNIT_ASSERT_EQUAL(label, tract._label);
 
@@ -86,13 +86,13 @@ pylith::faults::TestTractPerturbation::testLabel(void)
 // ----------------------------------------------------------------------
 // Test hasParameter().
 void
-pylith::faults::TestTractPerturbation::testHasParameter(void)
+pylith::faults::TestTractionPerturbation::testHasParameter(void)
 { // testHasParameter
   PYLITH_METHOD_BEGIN;
 
   spatialdata::spatialdb::SimpleDB db;
   
-  TractPerturbation tract;
+  TractionPerturbation tract;
 
   // no values
   CPPUNIT_ASSERT_EQUAL(false, tract.hasParameter("traction_initial_value"));
@@ -132,13 +132,13 @@ pylith::faults::TestTractPerturbation::testHasParameter(void)
 // ----------------------------------------------------------------------
 // Test initialize() using 2-D mesh.
 void
-pylith::faults::TestTractPerturbation::testInitialize(void)
+pylith::faults::TestTractionPerturbation::testInitialize(void)
 { // testInitialize
   PYLITH_METHOD_BEGIN;
 
   topology::Mesh mesh;
   topology::Mesh faultMesh;
-  TractPerturbation tract;
+  TractionPerturbation tract;
   _initialize(&mesh, &faultMesh, &tract);
   
   // Rely on testTraction() for verification of results.
@@ -149,7 +149,7 @@ pylith::faults::TestTractPerturbation::testInitialize(void)
 // ----------------------------------------------------------------------
 // Test calculate() using 2-D mesh().
 void
-pylith::faults::TestTractPerturbation::testCalculate(void)
+pylith::faults::TestTractionPerturbation::testCalculate(void)
 { // testCalculate
   PYLITH_METHOD_BEGIN;
 
@@ -160,10 +160,10 @@ pylith::faults::TestTractPerturbation::testCalculate(void)
 
   topology::Mesh mesh;
   topology::Mesh faultMesh;
-  TractPerturbation tract;
+  TractionPerturbation tract;
   _initialize(&mesh, &faultMesh, &tract);
   
-  const PylithScalar t = 2.134 / _TestTractPerturbation::timeScale;
+  const PylithScalar t = 2.134 / _TestTractionPerturbation::timeScale;
   tract.calculate(t);
 
   const spatialdata::geocoords::CoordSys* cs = faultMesh.coordsys();CPPUNIT_ASSERT(cs);
@@ -185,7 +185,7 @@ pylith::faults::TestTractPerturbation::testCalculate(void)
 
     for(PetscInt d = 0; d < spaceDim; ++d) {
       const PylithScalar valueE = tractionE[iPoint*spaceDim+d];
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(valueE, valueArray[voff+d]*_TestTractPerturbation::pressureScale, tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(valueE, valueArray[voff+d]*_TestTractionPerturbation::pressureScale, tolerance);
     } // for
   } // for
 
@@ -195,7 +195,7 @@ pylith::faults::TestTractPerturbation::testCalculate(void)
 // ----------------------------------------------------------------------
 // Test parameterFields() using 2-D mesh.
 void
-pylith::faults::TestTractPerturbation::testParameterFields(void)
+pylith::faults::TestTractionPerturbation::testParameterFields(void)
 { // testParameterFields
   PYLITH_METHOD_BEGIN;
 
@@ -209,7 +209,7 @@ pylith::faults::TestTractPerturbation::testParameterFields(void)
 
   topology::Mesh mesh;
   topology::Mesh faultMesh;
-  TractPerturbation tract;
+  TractionPerturbation tract;
   _initialize(&mesh, &faultMesh, &tract);
   
   const topology::Fields* parameters = tract.parameterFields();CPPUNIT_ASSERT(parameters);
@@ -239,24 +239,24 @@ pylith::faults::TestTractPerturbation::testParameterFields(void)
     PetscInt off = valueVisitor.sectionOffset(v);
     CPPUNIT_ASSERT_EQUAL(spaceDim, valueVisitor.sectionDof(v));
     for (int d=0; d < spaceDim; ++d, ++iE) {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], valueArray[off+d]*_TestTractPerturbation::pressureScale, tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], valueArray[off+d]*_TestTractionPerturbation::pressureScale, tolerance);
     } // for
 
     off = initialVisitor.sectionOffset(v);
     CPPUNIT_ASSERT_EQUAL(spaceDim, initialVisitor.sectionDof(v));
     for (int d=0; d < spaceDim; ++d, ++iE) {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], initialArray[off+d]*_TestTractPerturbation::pressureScale, tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], initialArray[off+d]*_TestTractionPerturbation::pressureScale, tolerance);
     } // for
 
     off = changeVisitor.sectionOffset(v);
     CPPUNIT_ASSERT_EQUAL(spaceDim, changeVisitor.sectionDof(v));
     for (int d=0; d < spaceDim; ++d, ++iE) {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], changeArray[off+d]*_TestTractPerturbation::pressureScale, tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], changeArray[off+d]*_TestTractionPerturbation::pressureScale, tolerance);
     } // for
 
     off = changeTimeVisitor.sectionOffset(v);
     CPPUNIT_ASSERT_EQUAL(1, changeTimeVisitor.sectionDof(v));
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], changeTimeArray[off]*_TestTractPerturbation::timeScale, tolerance);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(parametersE[iPoint*fiberDimE+iE], changeTimeArray[off]*_TestTractionPerturbation::timeScale, tolerance);
     ++iE;
 
   } // for
@@ -267,7 +267,7 @@ pylith::faults::TestTractPerturbation::testParameterFields(void)
 // ----------------------------------------------------------------------
 // Test vertexField() using 2-D mesh.
 void
-pylith::faults::TestTractPerturbation::testVertexField(void)
+pylith::faults::TestTractionPerturbation::testVertexField(void)
 { // testVertexField
   PYLITH_METHOD_BEGIN;
 
@@ -280,7 +280,7 @@ pylith::faults::TestTractPerturbation::testVertexField(void)
 
   topology::Mesh mesh;
   topology::Mesh faultMesh;
-  TractPerturbation tract;
+  TractionPerturbation tract;
   _initialize(&mesh, &faultMesh, &tract);
 
   const topology::Field& field = tract.vertexField(label);
@@ -299,7 +299,7 @@ pylith::faults::TestTractPerturbation::testVertexField(void)
     CPPUNIT_ASSERT_EQUAL(fiberDimE, fieldVisitor.sectionDof(v));
 
     for(PetscInt d = 0; d < fiberDimE; ++d) {
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(fieldE[iPoint*fiberDimE+d], fieldArray[off+d]*_TestTractPerturbation::timeScale, tolerance);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(fieldE[iPoint*fiberDimE+d], fieldArray[off+d]*_TestTractionPerturbation::timeScale, tolerance);
     } // for
   } // for
 
@@ -307,11 +307,11 @@ pylith::faults::TestTractPerturbation::testVertexField(void)
 } // testVertexField
 
 // ----------------------------------------------------------------------
-// Initialize TractPerturbation.
+// Initialize TractionPerturbation.
 void
-pylith::faults::TestTractPerturbation::_initialize(topology::Mesh* mesh,
+pylith::faults::TestTractionPerturbation::_initialize(topology::Mesh* mesh,
 						   topology::Mesh* faultMesh,
-						   TractPerturbation* tract)
+						   TractionPerturbation* tract)
 { // _initialize
   PYLITH_METHOD_BEGIN;
 
@@ -344,10 +344,10 @@ pylith::faults::TestTractPerturbation::_initialize(topology::Mesh* mesh,
 
   // Set scales
   spatialdata::units::Nondimensional normalizer;
-  normalizer.lengthScale(_TestTractPerturbation::lengthScale);
-  normalizer.pressureScale(_TestTractPerturbation::pressureScale);
-  normalizer.densityScale(_TestTractPerturbation::densityScale);
-  normalizer.timeScale(_TestTractPerturbation::timeScale);
+  normalizer.lengthScale(_TestTractionPerturbation::lengthScale);
+  normalizer.pressureScale(_TestTractionPerturbation::pressureScale);
+  normalizer.densityScale(_TestTractionPerturbation::densityScale);
+  normalizer.timeScale(_TestTractionPerturbation::timeScale);
   topology::MeshOps::nondimensionalize(mesh, normalizer);
 
   // Create fault mesh
@@ -387,7 +387,7 @@ pylith::faults::TestTractPerturbation::_initialize(topology::Mesh* mesh,
     }
   } // for
   
-  // setup TractPerturbation
+  // setup TractionPerturbation
   tract->dbInitial(&dbInitial);
   tract->dbChange(&dbChange);
   

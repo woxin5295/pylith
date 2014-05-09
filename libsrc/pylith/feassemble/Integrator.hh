@@ -203,17 +203,6 @@ public :
   void updateStateVars(const PylithScalar t,
 		       topology::SolutionFields* const fields);
 
-  /** Constrain solution space.
-   *
-   * @param fields Solution fields.
-   * @param t Current time.
-   * @param jacobian Sparse matrix for system Jacobian.
-   */
-  virtual
-  void constrainSolnSpace(topology::SolutionFields* const fields,
-			  const PylithScalar t,
-			  const topology::Jacobian& jacobian);
-
   /** Adjust solution from solver with lumped Jacobian to match Lagrange
    *  multiplier constraints.
    *

@@ -43,7 +43,7 @@ testfaults_SOURCES = \
 	TestFaultCohesiveKinSrcsCases.cc \
 	TestFaultCohesiveDyn.cc \
 	TestFaultCohesiveDynCases.cc \
-	TestTractPerturbation.cc \
+	TestTractionPerturbation.cc \
 	TestFaultCohesiveImpulses.cc \
 	TestFaultCohesiveImpulsesCases.cc \
 	test_faults.cc
@@ -65,7 +65,7 @@ noinst_HEADERS = \
 	TestFaultCohesiveKinSrcsCases.hh \
 	TestFaultCohesiveDyn.hh \
 	TestFaultCohesiveDynCases.hh \
-	TestTractPerturbation.hh \
+	TestTractionPerturbation.hh \
 	TestFaultCohesiveImpulses.hh \
 	TestFaultCohesiveImpulsesCases.hh \
 	TestFaultMesh.hh

@@ -59,7 +59,7 @@ public :
    *
    * @param tract Spatial and temporal variation of tractions.
    */
-  void tractPerturbation(TractPerturbation* tract);
+  void tractionPerturbation(TractionPerturbation* tract);
   
   /** Set the friction (constitutive) model.
    *
@@ -118,16 +118,6 @@ public :
   void updateStateVars(const PylithScalar t,
 		       topology::SolutionFields* const fields);
 
-  /** Constrain solution space based on friction.
-   *
-   * @param fields Solution fields.
-   * @param t Current time.
-   * @param jacobian Sparse matrix for system Jacobian.
-   */
-  void constrainSolnSpace(topology::SolutionFields* const fields,
-			  const PylithScalar t,
-			  const topology::Jacobian& jacobian);
-
   /** Adjust solution from solver with lumped Jacobian to match Lagrange
    *  multiplier constraints.
    *
@@ -151,14 +141,6 @@ public :
   // PRIVATE METHODS ////////////////////////////////////////////////////
 private :
 
-  /** Compute tractions on fault surface using solution.
-   *
-   * @param tractions Field for tractions.
-   * @param solution Solution over domain
-   */
-  void _calcTractions(topology::Field* tractions,
-          const topology::Field& solution);
-
   /** Update relative displacement and velocity associated with
    * Lagrange vertex k corresponding to diffential velocity between
    * conventional vertices i and j.
@@ -167,78 +149,41 @@ private :
    */
   void _updateRelMotion(const topology::SolutionFields& fields);
 
-  /** Setup sensitivity problem to compute change in slip given change
-   * in Lagrange multipliers.
+  /** Compute fault rheology traction for 2-D.
    *
-   * @param jacobian Jacobian matrix for entire domain.
-   */
-  void _sensitivitySetup(const topology::Jacobian& jacobian);
-
-  /** Update the Jacobian values for the sensitivity solve.
-   *
-   * @param negativeSide True if solving sensitivity problem for
-   * negative side of the fault, false if solving sensitivity problem
-   * for positive side of the fault.
-   * @param jacobian Jacobian matrix for entire domain.
-   * @param fields Solution fields.
-   */
-  void _sensitivityUpdateJacobian(const bool negativeSide,
-                                  const topology::Jacobian& jacobian,
-                                  const topology::SolutionFields& fields);
-
-  /** Reform residual for sensitivity problem.
-   *
-   * @param negativeSide True if solving sensitivity problem for
-   * negative side of the fault, false if solving sensitivity problem
-   * for positive side of the fault.
-   */
-  void _sensitivityReformResidual(const bool negativeSide);
-
-  /// Solve sensitivity problem.
-  void _sensitivitySolve(void);
-
-  /** Update the solution (displacement increment) values based on
-   * the sensitivity solve.
-   *
-   * @param negativeSide True if solving sensitivity problem for
-   * negative side of the fault, false if solving sensitivity problem
-   * for positive side of the fault.
-   */
-  void _sensitivityUpdateSoln(const bool negativeSide);
-
-  /** Compute norm of residual associated with matching fault
-   *  constitutive model using update from sensitivity solve. We use
-   *  this in a line search to find a good update (required because
-   *  fault constitutive model may have a complex nonlinear feedback
-   *  with deformation).
-   *
-   * @param alpha Current step in line search.
+   * @param tractionRheology Traction vector associated with fault rheology.
    * @param t Current time.
-   * @param fields Solution fields.
-   *
-   * @returns L2 norm of residual.
-   */
-  PylithScalar _constrainSolnSpaceNorm(const PylithScalar alpha,
-				       const PylithScalar t,
-				       topology::SolutionFields* const fields);
-
-  /** Constrain solution space in 1-D.
-   *
-   * @param dLagrangeTpdt Adjustment to Lagrange multiplier.
-   * @param t Current time.
-   * @param slip Slip assoc. w/Lagrange multiplier vertex.
-   * @param slipRate Slip rate assoc. w/Lagrange multiplier vertex.
-   * @param tractionTpdt Fault traction assoc. w/Lagrange multiplier vertex.
+   * @param slip Fault slip vector.
+   * @param slipRate Fault slip rate vector.
+   * @param tractionInternal Traction vector associated with internal forces.
    * @param jacobianShear Derivative of shear traction with respect to slip (elasticity).
-   * @param iterating True if iterating on solution.
+   *
+   * @returns True if Jacobian needs recomputing, false otherwise.
    */
-  void _constrainSolnSpace1D(scalar_array* dLagrangeTpdt,
-			     const PylithScalar t,
-			     const scalar_array& slip,
-			     const scalar_array& slipRate,
-			     const scalar_array& tractionTpdt,
-			     const PylithScalar jacobianShear,
-			     const bool iterating =true);
+  bool _calcRheologyTraction2D(scalar_array* tractionRheology,
+			       const PylithScalar t,
+			       const scalar_array& slip,
+			       const scalar_array& slipRate,
+			       const scalar_array& tractionInternal,
+			       const PylithScalar jacobianShear);
+
+  /** Compute fault rheology traction for 3-D.
+   *
+   * @param tractionRheology Traction vector associated with fault rheology.
+   * @param t Current time.
+   * @param slip Fault slip vector.
+   * @param slipRate Fault slip rate vector.
+   * @param tractionInternal Traction vector associated with internal forces.
+   * @param jacobianShear Derivative of shear traction with respect to slip (elasticity).
+   *
+   * @returns True if Jacobian needs recomputing, false otherwise.
+   */
+  bool _calcRheologyTraction3D(scalar_array* tractionRheology,
+			       const PylithScalar t,
+			       const scalar_array& slip,
+			       const scalar_array& slipRate,
+			       const scalar_array& tractionInternal,
+			       const PylithScalar jacobianShear);
 
   /** Constrain solution space in 2-D.
    *
@@ -288,15 +233,10 @@ private :
   PylithScalar _zeroTolerance;
 
   /// Prescribed traction variation.
-  TractPerturbation* _tractPerturbation;
+  TractionPerturbation* _tractionPerturbation;
 
   /// To identify constitutive model
   friction::FrictionModel* _friction;
-
-  /// Sparse matrix for sensitivity solve.
-  topology::Jacobian* _jacobian;
-
-  PetscKSP _ksp; ///< PETSc KSP linear solver for sensitivity problem.
 
 // NOT IMPLEMENTED ////////////////////////////////////////////////////
 private :

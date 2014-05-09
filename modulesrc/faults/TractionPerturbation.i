@@ -16,26 +16,26 @@
 // ----------------------------------------------------------------------
 //
 
-/** @file modulesrc/faults/TractPerturbation.i
+/** @file modulesrc/faults/TractionPerturbation.i
  *
- * @brief Python interface to C++ TractPerturbation object.
+ * @brief Python interface to C++ TractionPerturbation object.
  */
 
 namespace pylith {
   namespace faults {
 
-    class TractPerturbation : public pylith::bc::TimeDependent
-    { // class TractPerturbation
+    class TractionPerturbation : public pylith::bc::TimeDependent
+    { // class TractionPerturbation
 
       // PUBLIC METHODS /////////////////////////////////////////////////
     public :
 
       /// Default constructor.
-      TractPerturbation(void);
+      TractionPerturbation(void);
       
       /// Destructor.
       virtual
-      ~TractPerturbation(void);
+      ~TractionPerturbation(void);
       
       /// Deallocate PETSc and local data structures.
       virtual
@@ -95,7 +95,7 @@ namespace pylith {
        */
       const char* _getLabel(void) const;
 
-    }; // class TractPerturbation
+    }; // class TractionPerturbation
     
   } // faults
 } // pylith

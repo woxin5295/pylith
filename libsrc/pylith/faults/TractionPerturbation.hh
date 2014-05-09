@@ -16,14 +16,14 @@
 // ----------------------------------------------------------------------
 //
 
-/** @file libsrc/faults/TractPerturbation.hh
+/** @file libsrc/faults/TractionPerturbation.hh
  *
  * @brief C++ implementation of a spatial and temporal perturbation in
  * tractions.
  */
 
-#if !defined(pylith_faults_tractperturbation_hh)
-#define pylith_faults_tractperturbation_hh
+#if !defined(pylith_faults_tractionperturbation_hh)
+#define pylith_faults_tractionperturbation_hh
 
 // Include directives ---------------------------------------------------
 #include "faultsfwd.hh" // forward declarations
@@ -31,24 +31,24 @@
 
 #include "spatialdata/units/unitsfwd.hh" // USES Nondimensional
 
-// TractPerturbation -----------------------------------------------------------
+// TractionPerturbation -----------------------------------------------------------
 /**
  * @brief C++ implementation of a spatial and temporal perturbation in
  * tractions.
  */
-class pylith::faults::TractPerturbation : public pylith::bc::TimeDependent
-{ // class TractPerturbation
-  friend class TestTractPerturbation; // unit testing
+class pylith::faults::TractionPerturbation : public pylith::bc::TimeDependent
+{ // class TractionPerturbation
+  friend class TestTractionPerturbation; // unit testing
 
   // PUBLIC METHODS /////////////////////////////////////////////////////
 public :
 
   /// Default constructor.
-  TractPerturbation(void);
+  TractionPerturbation(void);
 
   /// Destructor.
   virtual
-  ~TractPerturbation(void);
+  ~TractionPerturbation(void);
 
   /// Deallocate PETSc and local data structures.
   virtual
@@ -137,12 +137,12 @@ private :
   // NOT IMPLEMENTED ////////////////////////////////////////////////////
 private :
 
-  TractPerturbation(const TractPerturbation&); ///< Not implemented
-  const TractPerturbation& operator=(const TractPerturbation&); ///< Not implemented
+  TractionPerturbation(const TractionPerturbation&); ///< Not implemented
+  const TractionPerturbation& operator=(const TractionPerturbation&); ///< Not implemented
 
-}; // class TractPerturbation
+}; // class TractionPerturbation
 
-#endif // pylith_faults_tractperturbation_hh
+#endif // pylith_faults_tractionperturbation_hh
 
 
 // End of file 

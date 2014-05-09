@@ -32,7 +32,7 @@ swig_sources = \
 	LiuCosSlipFn.i \
 	TimeHistorySlipFn.i \
 	EqKinSrc.i \
-	TractPerturbation.i \
+	TractionPerturbation.i \
 	Fault.i \
 	FaultCohesive.i \
 	FaultCohesiveLagrange.i \
