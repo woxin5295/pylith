@@ -44,14 +44,13 @@ pylith::faults::CohesiveDynData::CohesiveDynData(void) :
   fieldIncrOpen(0),
   jacobian(0),
   orientation(0),
-  initialTractions(0),
   area(0),
-  slipStickE(0),
-  fieldIncrSlipE(0),
-  slipSlipE(0),
-  fieldIncrOpenE(0),
-  slipOpenE(0),
+  initialTractions(0),
+  residualStickE(0),
+  residualSlipE(0),
+  residualOpenE(0),
   constraintEdges(0),
+  negativeVertices(0),
   numConstraintEdges(0)
 { // constructor
   const PylithScalar velScale = lengthScale / timeScale;

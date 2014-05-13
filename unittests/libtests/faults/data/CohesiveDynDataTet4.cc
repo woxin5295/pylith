@@ -518,11 +518,19 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrStick[] = {
  -81.1, 2.1, 3.1, // 36
 };
 
-// No slip
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_slipStickE[] = {
-  0.0,  0.0,  0.0,
-  0.0,  0.0,  0.0,
-  0.0,  0.0,  0.0,
+// Output
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualStickE[] = {
+  1.1, 2.1, 3.1,
+  1.2, 2.2, 3.2, // 4
+  1.3, 2.3, 3.3, // 5
+  1.4, 2.4, 3.4, // 6
+  1.5, 2.5, 3.5,
+  1.2, 2.2, 3.2, // 8
+  1.3, 2.3, 3.3, // 9
+  1.4, 2.4, 3.4, // 10
+ -81.7, 2.7, 3.7, // 34
+ -81.9, 2.9, 3.9, // 35
+ -81.1, 2.1, 3.1, // 36
 };
 
 // ----------------------------------------------------------------------
@@ -544,7 +552,7 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrSlip[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrSlipE[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualSlipE[] = {
    1.100000000000,   2.100000000000,   3.100000000000,
    1.200000000000,   2.200000916680,   3.200000185945,
    1.300000000000,   2.299999954294,   3.300000084646,
@@ -556,12 +564,6 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrSlipE[] = {
   -4.700000000000, -13.650158708856, -14.236237291549,
   -4.900000000000, -13.683824215808, -14.263164878373,
   -4.100000000000, -13.548480328050, -14.156107942537,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_slipSlipE[] = {
-  -0.000001833360,  -0.000000371890,   0.000000000000,
-   0.000000091413,  -0.000000169291,   0.000000000000,
-  -0.000000930394,  -0.000000739303,   0.000000000000,
 };
 
 // ----------------------------------------------------------------------
@@ -583,7 +585,7 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrOpen[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrOpenE[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualOpenE[] = {
    1.100000000000,   2.100000000000,   3.100000000000,
    1.199999161233,   2.200004202086,   3.200002477003,
    1.299998110594,   2.300001999917,   3.300002482177,
@@ -595,12 +597,6 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrOpenE[] = {
    7.700000000000, -18.700000000000, -19.700000000000,
    7.900000000000, -18.900000000000, -19.900000000000,
    7.100000000000, -18.100000000000, -19.100000000000,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_slipOpenE[] = {
-  -0.000008404171,  -0.000004954006,   0.000001677534,
-  -0.000003999835,  -0.000004964354,   0.000003778811,
-  -0.000005176299,  -0.000004948142,   0.000000000000,
 };
 
 // ----------------------------------------------------------------------
@@ -632,17 +628,15 @@ pylith::faults::CohesiveDynDataTet4::CohesiveDynDataTet4(void)
 
   // Stick
   fieldIncrStick = const_cast<PylithScalar*>(_fieldIncrStick);
-  slipStickE = const_cast<PylithScalar*>(_slipStickE);
+  residualStickE = const_cast<PylithScalar*>(_residualStickE);
 
   // Slip
   fieldIncrSlip = const_cast<PylithScalar*>(_fieldIncrSlip);
-  fieldIncrSlipE = const_cast<PylithScalar*>(_fieldIncrSlipE);
-  slipSlipE = const_cast<PylithScalar*>(_slipSlipE);
+  residualSlipE = const_cast<PylithScalar*>(_residualSlipE);
 
   // Open
   fieldIncrOpen = const_cast<PylithScalar*>(_fieldIncrOpen);
-  fieldIncrOpenE = const_cast<PylithScalar*>(_fieldIncrOpenE);
-  slipOpenE = const_cast<PylithScalar*>(_slipOpenE);
+  residualOpenE = const_cast<PylithScalar*>(_residualOpenE);
 } // constructor
 
 pylith::faults::CohesiveDynDataTet4::~CohesiveDynDataTet4(void)

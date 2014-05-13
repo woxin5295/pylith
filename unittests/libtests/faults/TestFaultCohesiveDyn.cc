@@ -240,68 +240,34 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualStick(void)
   const topology::Field& residual = fields.get("residual");
   fault.integrateResidual(residual, t, &fields);
   
-  topology::Field& solution = fields.solution();
-  const topology::Field& dispIncrAdj = fields.get("dispIncr adjust");
-  solution += dispIncrAdj;
-
   fault.updateStateVars(t, &fields);
 
-  { // Check solution values
-    // No change to Lagrange multipliers for stick case.
-
+  //residual.view("RESIDUAL"); // DEBUGGING
+  { // Check residual values
     PetscDM dmMesh = mesh.dmMesh();CPPUNIT_ASSERT(dmMesh);
     topology::Stratum verticesStratum(dmMesh, topology::Stratum::DEPTH, 0);
     const PetscInt vStart = verticesStratum.begin();
     const PetscInt vEnd = verticesStratum.end();
 
-    topology::VecVisitorMesh dispIncrVisitor(fields.get("dispIncr(t->t+dt)"));
-    const PetscScalar* dispIncrArray = dispIncrVisitor.localArray();CPPUNIT_ASSERT(dispIncrArray);
+    topology::VecVisitorMesh residualVisitor(fields.get("residual"));
+    const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
-    const PylithScalar* valsE = _data->fieldIncrStick;CPPUNIT_ASSERT(valsE);
+    const PylithScalar* residualE = _data->residualStickE;CPPUNIT_ASSERT(residualE);
     const int fiberDimE = spaceDim; // number of values per point
     const PylithScalar tolerance = 1.0e-06;
-    for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = dispIncrVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, dispIncrVisitor.sectionDof(v));
+    for (PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
+      const PetscInt off = residualVisitor.sectionOffset(v);
+      CPPUNIT_ASSERT_EQUAL(fiberDimE, residualVisitor.sectionDof(v));
       for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
+        const PylithScalar valE = residualE[iVertex*spaceDim+d];
         if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, dispIncrArray[off+d]/valE, tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, residualArray[off+d]/valE, tolerance);
         } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, dispIncrArray[off+d], tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, residualArray[off+d], tolerance);
 	} // if/else
       } // for
     } // for
-  } // Check solution values
-
-  { // Check slip values
-    // Slip should be zero for the stick case.
-
-    // Get fault vertex info
-    PetscDM faultDMMesh = fault._faultMesh->dmMesh();CPPUNIT_ASSERT(faultDMMesh);
-    topology::Stratum verticesStratum(faultDMMesh, topology::Stratum::DEPTH, 0);
-    const PetscInt vStart = verticesStratum.begin();
-    const PetscInt vEnd = verticesStratum.end();
-    
-    topology::VecVisitorMesh slipVisitor(fault.vertexField("slip"));
-    const PetscScalar* slipArray = slipVisitor.localArray();CPPUNIT_ASSERT(slipArray);
-
-    const PylithScalar* valsE = _data->slipStickE;CPPUNIT_ASSERT(valsE);
-    const int fiberDimE = spaceDim; // number of values per point
-    const PylithScalar tolerance = 1.0e-06;
-    for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = slipVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, slipVisitor.sectionDof(v));
-      for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
-        if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, slipArray[off+d]/valE, tolerance);
-        } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, slipArray[off+d], tolerance);
-	} // if/else
-      } // for
-    } // for
-  } // Check slip values
+  } // Check residual values
 
   PYLITH_METHOD_END;
 } // testIntegrateResidualStick
@@ -331,71 +297,32 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualSlip(void)
   const topology::Field& residual = fields.get("residual");
   fault.integrateResidual(residual, t, &fields);
 
-  topology::Field& solution = fields.solution();
-  const topology::Field& dispIncrAdj = fields.get("dispIncr adjust");
-  solution += dispIncrAdj;
-
-  fault.updateStateVars(t, &fields);
-
-  //solution.view("SOLUTION"); // DEBUGGING
-
-  { // Check solution values
-    // Lagrange multipliers should be adjusted according to friction
-    // as reflected in the fieldIncrSlipE data member.
-
+  //residual.view("RESIDUAL"); // DEBUGGING
+  { // Check residual values
     PetscDM dmMesh = mesh.dmMesh();CPPUNIT_ASSERT(dmMesh);
     topology::Stratum verticesStratum(dmMesh, topology::Stratum::DEPTH, 0);
     const PetscInt vStart = verticesStratum.begin();
     const PetscInt vEnd = verticesStratum.end();
 
-    topology::VecVisitorMesh dispIncrVisitor(fields.get("dispIncr(t->t+dt)"));
-    const PetscScalar* dispIncrArray = dispIncrVisitor.localArray();CPPUNIT_ASSERT(dispIncrArray);
+    topology::VecVisitorMesh residualVisitor(fields.get("residual"));
+    const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
-    const PylithScalar* valsE = _data->fieldIncrSlipE;CPPUNIT_ASSERT(valsE);
+    const PylithScalar* residualE = _data->residualSlipE;CPPUNIT_ASSERT(residualE);
     const int fiberDimE = spaceDim; // number of values per point
     const PylithScalar tolerance = 1.0e-06;
     for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = dispIncrVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, dispIncrVisitor.sectionDof(v));
+      const PetscInt off = residualVisitor.sectionOffset(v);
+      CPPUNIT_ASSERT_EQUAL(fiberDimE, residualVisitor.sectionDof(v));
       for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
+        const PylithScalar valE = residualE[iVertex*spaceDim+d];
         if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, dispIncrArray[off+d]/valE, tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, residualArray[off+d]/valE, tolerance);
         } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, dispIncrArray[off+d], tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, residualArray[off+d], tolerance);
 	} // if/else
       } // for
     } // for
-  } // Check solution values
-
-  { // Check slip values
-    // Slip values should be adjusted based on the change in the
-    // Lagrange multipliers as reflected in the slipSlipE data member.
-
-    PetscDM faultDMMesh = fault._faultMesh->dmMesh();CPPUNIT_ASSERT(faultDMMesh);
-    topology::Stratum verticesStratum(faultDMMesh, topology::Stratum::DEPTH, 0);
-    const PetscInt vStart = verticesStratum.begin();
-    const PetscInt vEnd = verticesStratum.end();
-
-    topology::VecVisitorMesh slipVisitor(fault.vertexField("slip"));
-    const PetscScalar* slipArray = slipVisitor.localArray();CPPUNIT_ASSERT(slipArray);
-
-    const PylithScalar* valsE = _data->slipSlipE;CPPUNIT_ASSERT(valsE);
-    const int fiberDimE = spaceDim; // number of values per point
-    const PylithScalar tolerance = (sizeof(double) == sizeof(PylithScalar)) ? 1.0e-06 : 1.0e-5;
-    for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = slipVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, slipVisitor.sectionDof(v));
-      for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
-        if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, slipArray[off+d]/valE, tolerance);
-        } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, slipArray[off+d], tolerance);
-	} // if/else
-      } // for
-    } // for
-  } // Check slip values
+  } // Check residual values
 
   PYLITH_METHOD_END;
 } // testIntegrateResidualSlip
@@ -431,65 +358,32 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualOpen(void)
 
   fault.updateStateVars(t, &fields);
 
-  //solution.view("SOLUTION"); // DEBUGGING
-
-  { // Check solution values
-    // Lagrange multipliers should be set to zero as reflected in the
-    // fieldIncrOpenE data member.
-
+  //residual.view("RESIDUAL"); // DEBUGGING
+  { // Check residual values
     PetscDM dmMesh = mesh.dmMesh();CPPUNIT_ASSERT(dmMesh);
     topology::Stratum verticesStratum(dmMesh, topology::Stratum::DEPTH, 0);
     const PetscInt vStart = verticesStratum.begin();
     const PetscInt vEnd = verticesStratum.end();
 
-    topology::VecVisitorMesh dispIncrVisitor(fields.get("dispIncr(t->t+dt)"));
-    const PetscScalar* dispIncrArray = dispIncrVisitor.localArray();CPPUNIT_ASSERT(dispIncrArray);
+    topology::VecVisitorMesh residualVisitor(fields.get("residual"));
+    const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
-    const PylithScalar* valsE = _data->fieldIncrOpenE;CPPUNIT_ASSERT(valsE);
+    const PylithScalar* residualE = _data->residualOpenE;CPPUNIT_ASSERT(residualE);
     const int fiberDimE = spaceDim; // number of values per point
-    const PylithScalar tolerance = (sizeof(double) == sizeof(PylithScalar)) ? 1.0e-06 : 1.0e-05;
+    const PylithScalar tolerance = 1.0e-06;
     for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = dispIncrVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, dispIncrVisitor.sectionDof(v));
+      const PetscInt off = residualVisitor.sectionOffset(v);
+      CPPUNIT_ASSERT_EQUAL(fiberDimE, residualVisitor.sectionDof(v));
       for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
+        const PylithScalar valE = residualE[iVertex*spaceDim+d];
         if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, dispIncrArray[off+d]/valE, tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, residualArray[off+d]/valE, tolerance);
         } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, dispIncrArray[off+d], tolerance);
+          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, residualArray[off+d], tolerance);
 	} // if/else
       } // for
     } // for
-  } // Check solution values
-
-  { // Check slip values
-    // Slip values should be adjusted based on the change in the
-    // Lagrange multipliers as reflected in the slipOpenE data member.
-
-    PetscDM faultDMMesh = fault._faultMesh->dmMesh();CPPUNIT_ASSERT(faultDMMesh);
-    topology::Stratum verticesStratum(faultDMMesh, topology::Stratum::DEPTH, 0);
-    const PetscInt vStart = verticesStratum.begin();
-    const PetscInt vEnd = verticesStratum.end();
-    
-    topology::VecVisitorMesh slipVisitor(fault.vertexField("slip"));
-    const PetscScalar* slipArray = slipVisitor.localArray();CPPUNIT_ASSERT(slipArray);
-
-    const PylithScalar* valsE = _data->slipOpenE;CPPUNIT_ASSERT(valsE);
-    const int fiberDimE = spaceDim; // number of values per point
-    const PylithScalar tolerance = (sizeof(double) == sizeof(PylithScalar)) ? 1.0e-06 : 1.0e-05;
-    for(PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = slipVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, slipVisitor.sectionDof(v));
-      for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = valsE[iVertex*spaceDim+d];
-        if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, slipArray[off+d]/valE, tolerance);
-        } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, slipArray[off+d], tolerance);
-	} // if/else
-      } // for
-    } // for
-  } // Check slip values
+  } // Check residual values
 
   PYLITH_METHOD_END;
 } // testIntegrateResidualOpen

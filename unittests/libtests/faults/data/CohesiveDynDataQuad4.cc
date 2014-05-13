@@ -312,10 +312,18 @@ const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrStick[] = {
  -21.6,  2.5, // 20
 };
 
-// No change in slip
-const PylithScalar pylith::faults::CohesiveDynDataQuad4::_slipStickE[] = {
-  0.4,  0.0,
-  0.5,  0.0,
+// Output
+const PylithScalar pylith::faults::CohesiveDynDataQuad4::_residualStickE[] = {
+  1.1, 2.1,
+  1.4, 2.4,
+  1.2, 2.2, // 4
+  1.3, 2.3, // 5
+  1.5, 2.5,
+  1.6, 2.6,
+  1.2, 2.2, // 8
+  1.3, 2.3, // 9
+ -21.6,  2.6, // 19
+ -21.6,  2.5, // 20
 };
 
 // ----------------------------------------------------------------------
@@ -336,7 +344,7 @@ const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrSlip[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrSlipE[] = {
+const PylithScalar pylith::faults::CohesiveDynDataQuad4::_residualSlipE[] = {
    1.100000000000,   2.100000000000,
    1.200000000000,   2.200000000000,
    1.200000000000,   2.200157498929,
@@ -347,11 +355,6 @@ const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrSlipE[] = {
    1.300000000000,   2.299031114110,
   -1.600000000000,  -3.480000000000,
   -1.800000000000,  -3.440000000000,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataQuad4::_slipSlipE[] = {
-   0.399685002143,   0.000000000000,
-   0.498062228219,   0.000000000000,
 };
 
 // ----------------------------------------------------------------------
@@ -372,7 +375,7 @@ const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrOpen[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrOpenE[] = {
+const PylithScalar pylith::faults::CohesiveDynDataQuad4::_residualOpenE[] = {
    1.100000000000,   2.100000000000,
    1.200000000000,   2.200000000000,
    1.199388886535,   2.200357375764,
@@ -383,11 +386,6 @@ const PylithScalar pylith::faults::CohesiveDynDataQuad4::_fieldIncrOpenE[] = {
    1.300582913452,   2.299960483853,
    8.600000000000,  -9.600000000000,
    8.800000000000,  -9.800000000000,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataQuad4::_slipOpenE[] = {
-   0.399285248472,   0.001222226930,
-   0.499920967705,   0.001165826903,
 };
 
 // ----------------------------------------------------------------------
@@ -419,17 +417,15 @@ pylith::faults::CohesiveDynDataQuad4::CohesiveDynDataQuad4(void)
 
   // Stick
   fieldIncrStick = const_cast<PylithScalar*>(_fieldIncrStick);
-  slipStickE = const_cast<PylithScalar*>(_slipStickE);
+  residualStickE = const_cast<PylithScalar*>(_residualStickE);
 
   // Slip
   fieldIncrSlip = const_cast<PylithScalar*>(_fieldIncrSlip);
-  fieldIncrSlipE = const_cast<PylithScalar*>(_fieldIncrSlipE);
-  slipSlipE = const_cast<PylithScalar*>(_slipSlipE);
+  residualSlipE = const_cast<PylithScalar*>(_residualSlipE);
 
   // Open
   fieldIncrOpen = const_cast<PylithScalar*>(_fieldIncrOpen);
-  fieldIncrOpenE = const_cast<PylithScalar*>(_fieldIncrOpenE);
-  slipOpenE = const_cast<PylithScalar*>(_slipOpenE);
+  residualOpenE = const_cast<PylithScalar*>(_residualOpenE);
 } // constructor
 
 pylith::faults::CohesiveDynDataQuad4::~CohesiveDynDataQuad4(void)

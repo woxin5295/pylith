@@ -68,11 +68,9 @@ private:
   static const PylithScalar _orientation[]; ///< Expected values for fault orientation.
   static const PylithScalar _area[]; ///< Expected values for fault area.
   static const PylithScalar _initialTractions[]; ///< Expected values for initial tractions.
-  static const PylithScalar _slipStickE[]; ///< Expected values for slip for stick case.
-  static const PylithScalar _fieldIncrSlipE[]; ///< Expected values for solution increment for slip case.
-  static const PylithScalar _slipSlipE[]; ///< Expected values for slip for slip case.
-  static const PylithScalar _fieldIncrOpenE[]; ///< Expected values for solution increment for opening case.
-  static const PylithScalar _slipOpenE[]; ///< Expected values for slip for opening case.
+  static const PylithScalar _residualStickE[]; ///< Expected values for residual for stick case.
+  static const PylithScalar _residualSlipE[]; ///< Expected values for residual for slip case.
+  static const PylithScalar _residualOpenE[]; ///< Expected values for residual for opening case.
   static const int _constraintEdges[]; ///< Expected points for constraint edges
   static const int _negativeVertices[]; ///< Expected points for negative-side fault vertices
   static const int _numConstraintEdges; ///< Number of constraint edges

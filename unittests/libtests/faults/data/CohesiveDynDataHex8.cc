@@ -1382,12 +1382,28 @@ const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrStick[5*4*3] =
  -17.666666666667, 10.0, 2.0, // 62
 };
 
-// No slip
-const PylithScalar pylith::faults::CohesiveDynDataHex8::_slipStickE[] = {
-  0.7,  0.8,  0.0,
-  0.9,  1.0,  0.0,
-  1.0,  0.9,  0.0,
-  0.8,  0.7,  0.0,
+// Output
+const PylithScalar pylith::faults::CohesiveDynDataHex8::_residualStickE[20*3] = {
+   1.100000000000,   2.100000000000,   0.100000000000,
+   1.200000000000,   2.200000000000,   0.200000000000,
+   1.300000000000,   2.300000000000,   0.300000000000,
+   1.400000000000,   2.400000000000,   0.400000000000,
+   1.500000000000,   2.500001245294,   0.500000812227,
+   1.600000000000,   2.600000694980,   0.600000786664,
+   1.700000000000,   2.700000891763,   0.700000882544,
+   1.800000000000,   2.800000903108,   0.800000871357,
+   1.900000000000,   2.900000000000,   0.900000000000,
+   1.000000000000,   2.000000000000,   0.000000000000,
+   1.100000000000,   2.100000000000,   0.100000000000,
+   1.200000000000,   2.200000000000,   0.200000000000,
+   1.500000000000,   2.499998754706,   0.499999187773,
+   1.600000000000,   2.599999305020,   0.599999213336,
+   1.700000000000,   2.699999108237,   0.699999117456,
+   1.800000000000,   2.799999096892,   0.799999128643,
+  -1.400000000000,   0.328479469127,  -1.239953753608,
+  -1.600000000000,   0.293941190358,  -1.262585961634,
+  -1.800000000000,   0.259995967920,  -1.286431883494,
+  -1.000000000000,   0.342606428329,  -1.125914857337,
 };
 
 // ----------------------------------------------------------------------
@@ -1418,7 +1434,7 @@ const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrSlip[5*4*3] = 
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrSlipE[20*3] = {
+const PylithScalar pylith::faults::CohesiveDynDataHex8::_residualSlipE[20*3] = {
    1.100000000000,   2.100000000000,   0.100000000000,
    1.200000000000,   2.200000000000,   0.200000000000,
    1.300000000000,   2.300000000000,   0.300000000000,
@@ -1439,13 +1455,6 @@ const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrSlipE[20*3] = 
   -1.600000000000,   0.293941190358,  -1.262585961634,
   -1.800000000000,   0.259995967920,  -1.286431883494,
   -1.000000000000,   0.342606428329,  -1.125914857337,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataHex8::_slipSlipE[] = {
-   0.699997509413,   0.799998375546,   0.000000000000,
-   0.899998610039,   0.999998426672,   0.000000000000,
-   0.999998216473,   0.899998234913,   0.000000000000,
-   0.799998193784,   0.699998257287,   0.000000000000,
 };
 
 // ----------------------------------------------------------------------
@@ -1476,7 +1485,7 @@ const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrOpen[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrOpenE[] = {
+const PylithScalar pylith::faults::CohesiveDynDataHex8::_residualOpenE[] = {
    1.100000000000,   2.100000000000,   0.100000000000,
    1.200000000000,   2.200000000000,   0.200000000000,
    1.300000000000,   2.300000000000,   0.300000000000,
@@ -1497,13 +1506,6 @@ const PylithScalar pylith::faults::CohesiveDynDataHex8::_fieldIncrOpenE[] = {
    4.600000000000,  -2.600000000000,  -3.600000000000,
    4.800000000000,  -2.800000000000,  -3.800000000000,
    4.000000000000,  -2.000000000000,  -3.000000000000,
-};
-
-const PylithScalar pylith::faults::CohesiveDynDataHex8::_slipOpenE[] = {
-   0.699984235848,   0.799989413370,   0.000000000000,
-   0.899990250419,   0.999989418790,   0.000000000000,
-   0.999987823504,   0.899988081646,   0.000000000000,
-   0.799987427233,   0.699987868197,   0.000000000000,
 };
 
 // ----------------------------------------------------------------------
@@ -1535,17 +1537,15 @@ pylith::faults::CohesiveDynDataHex8::CohesiveDynDataHex8(void)
 
   // Stick
   fieldIncrStick = const_cast<PylithScalar*>(_fieldIncrStick);
-  slipStickE = const_cast<PylithScalar*>(_slipStickE);
+  residualStickE = const_cast<PylithScalar*>(_residualStickE);
 
   // Slip
   fieldIncrSlip = const_cast<PylithScalar*>(_fieldIncrSlip);
-  fieldIncrSlipE = const_cast<PylithScalar*>(_fieldIncrSlipE);
-  slipSlipE = const_cast<PylithScalar*>(_slipSlipE);
+  residualSlipE = const_cast<PylithScalar*>(_residualSlipE);
 
   // Open
   fieldIncrOpen = const_cast<PylithScalar*>(_fieldIncrOpen);
-  fieldIncrOpenE = const_cast<PylithScalar*>(_fieldIncrOpenE);
-  slipOpenE = const_cast<PylithScalar*>(_slipOpenE);
+  residualOpenE = const_cast<PylithScalar*>(_residualOpenE);
 } // constructor
 
 pylith::faults::CohesiveDynDataHex8::~CohesiveDynDataHex8(void)
