@@ -240,32 +240,30 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualStick(void)
   const topology::Field& residual = fields.get("residual");
   fault.integrateResidual(residual, t, &fields);
   
-  fault.updateStateVars(t, &fields);
-
-  //residual.view("RESIDUAL"); // DEBUGGING
+  residual.view("RESIDUAL"); // DEBUGGING
   { // Check residual values
-    PetscDM dmMesh = mesh.dmMesh();CPPUNIT_ASSERT(dmMesh);
-    topology::Stratum verticesStratum(dmMesh, topology::Stratum::DEPTH, 0);
-    const PetscInt vStart = verticesStratum.begin();
-    const PetscInt vEnd = verticesStratum.end();
-
-    topology::VecVisitorMesh residualVisitor(fields.get("residual"));
+    PetscInt pStart=0, pEnd=0;
+    topology::VecVisitorMesh residualVisitor(residual);
+    PetscErrorCode err = PetscSectionGetChart(residual.petscSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
     const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
     const PylithScalar* residualE = _data->residualStickE;CPPUNIT_ASSERT(residualE);
     const int fiberDimE = spaceDim; // number of values per point
     const PylithScalar tolerance = 1.0e-06;
-    for (PetscInt v = vStart, iVertex = 0; v < vEnd; ++v, ++iVertex) {
-      const PetscInt off = residualVisitor.sectionOffset(v);
-      CPPUNIT_ASSERT_EQUAL(fiberDimE, residualVisitor.sectionDof(v));
-      for(PetscInt d = 0; d < fiberDimE; ++d) {
-        const PylithScalar valE = residualE[iVertex*spaceDim+d];
-        if (fabs(valE) > tolerance) {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, residualArray[off+d]/valE, tolerance);
-        } else {
-          CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, residualArray[off+d], tolerance);
-	} // if/else
-      } // for
+
+    for (PetscInt p=pStart, iPoint=0; p < pEnd; ++p, ++iPoint) {
+      if (residualVisitor.sectionDof(p) > 0) {
+	const PetscInt off = residualVisitor.sectionOffset(p);
+	CPPUNIT_ASSERT_EQUAL(fiberDimE, residualVisitor.sectionDof(p));
+	for (PetscInt iDim=0; iDim < fiberDimE; ++iDim) {
+	  const PylithScalar valE = residualE[iPoint*fiberDimE+iDim];
+	  if (fabs(valE) > tolerance) {
+	    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, residualArray[off+iDim]/valE, tolerance);
+	  } else {
+	    CPPUNIT_ASSERT_DOUBLES_EQUAL(valE, residualArray[off+iDim], tolerance);
+	  } // if/else
+	} // for
+      } // if
     } // for
   } // Check residual values
 

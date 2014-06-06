@@ -222,7 +222,8 @@ pylith::faults::FaultCohesiveLagrange::setupSolnDof(topology::Field* field)
     const int v_negative = _cohesiveVertices[iVertex].negative;
     const int e_lagrange = _cohesiveVertices[iVertex].lagrange;
 
-    if (e_lagrange < 0) continue;
+    if (e_lagrange < 0) continue; // skipped clamped edges
+
     // Set DOF in section (all subfields)
     err = PetscSectionSetDof(fieldSection, e_lagrange, spaceDim);PYLITH_CHECK_ERROR(err);
     err = PetscSectionSetDof(fieldSection, v_positive, spaceDim);PYLITH_CHECK_ERROR(err);

@@ -233,7 +233,6 @@ pylith::friction::FrictionModel::initialize(const topology::Mesh& faultMesh,
 	PetscScalar* stateVarArray = stateVarVisitor.localArray();
 	const PetscInt off = stateVarVisitor.sectionOffset(v);
 	const PetscInt dof = stateVarVisitor.sectionDof(v);
-	std::cout << "v: " << v << ", dof: " << dof << ", stateVarsVetex: " << stateVarsVertex.size() << std::endl;
 	assert(stateVarsVertex.size() == dof);
         for(PetscInt d = 0; d < dof; ++d, ++iOff) {
           stateVarArray[off+d] += stateVarsVertex[iOff];

@@ -349,6 +349,9 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     const PetscInt rloff = residualVisitor.sectionOffset(e_lagrange);
     assert(spaceDim == residualVisitor.sectionDof(e_lagrange));
 
+    // Get friction properties and state variables.
+    _friction->retrievePropsStateVars(v_fault);
+
 #if defined(DETAILED_EVENT_LOGGING)
     _logger->eventEnd(restrictEvent);
     _logger->eventBegin(computeEvent);
@@ -370,10 +373,10 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
       if (fabs(slipRateVertex[iDim]) < _zeroTolerance) {
         slipRateVertex[iDim] = 0.0;
       } // if
+      if (fabs(slipVertex[iDim]) < _zeroTolerance) {
+        slipVertex[iDim] = 0.0;
+      } // if
     } // for
-    if (fabs(slipVertex[indexN]) < _zeroTolerance) {
-      slipVertex[indexN] = 0.0;
-    } // if
     
 #if defined(DETAILED_EVENT_LOGGING)
     _logger->eventEnd(computeEvent);
@@ -403,8 +406,8 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
 	tractionContactArray[coff+iDim] = tractionRheologyVertex[iDim] - tractionInternalVertex[iDim];
 
 	for (PetscInt jDim = 0; jDim < spaceDim; ++jDim) {
-	  tractionRheologyGlobalVertex += orientationArray[ooff+jDim*spaceDim+iDim] * tractionRheologyVertex[jDim];
-	  tractionInternalGlobalVertex += orientationArray[ooff+jDim*spaceDim+iDim] * tractionInternalVertex[jDim];
+	  tractionRheologyGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionRheologyVertex[jDim];
+	  tractionInternalGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionInternalVertex[jDim];
 	} // for
       } // for
 
@@ -416,7 +419,29 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
 	const PylithScalar dispRelVertex = dispTArray[dtpoff+iDim] + dispTIncrArray[dipoff+iDim] - dispTArray[dtnoff+iDim] - dispTIncrArray[dinoff+iDim];
 	residualArray[rloff+iDim] += areaArray[aoff] * tractionInternalGlobalVertex[iDim] * dispRelVertex;
       } // for
+
+#if 1 // DEBUGGING
+	std::cout << "v_fault: " << v_fault
+		  << ", v_neg: " << v_negative
+		  << ", v_pos: " << v_positive
+		  << ", e_lagrange: " << e_lagrange
+		  << ", area: " << areaArray[aoff]
+		  << ", T_f: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyVertex[iDim]; }
+	std::cout << "), T_i: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalVertex[iDim]; }
+	std::cout << "), T_fg: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyGlobalVertex[iDim]; }
+	std::cout << "), T_ig: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalGlobalVertex[iDim]; }
+	std::cout << "), residual_neg: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rnoff+iDim]; }
+	std::cout << "), residual_pos: (";
+	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rpoff+iDim]; }
+	std::cout << std::endl;
+#endif
     } else { // opening, normal traction should be zero
+      std::cout << "Opening" << std::endl;
       for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
 	tractionContactArray[coff+iDim] = 0.0;
       } // for
@@ -1080,6 +1105,8 @@ pylith::faults::FaultCohesiveDyn::_calcRheologyTraction2D(scalar_array* traction
   if (fabs(slip[1]) < _zeroTolerance && tractionNormal < -_zeroTolerance) {
     // if in compression and no opening
     PylithScalar frictionStress = _friction->calcFriction(t, slipMag, slipRateMag, tractionNormal);
+    std::cout << "  slipMag: " << slipMag << ", tractionNormal: " << tractionNormal << ", friction: " << frictionStress << std::endl;
+
 
 #if 1 // New Newton stuff
     if (tractionShearMag > 0.0 && 0.0 != jacobianShear) {
@@ -1118,6 +1145,7 @@ pylith::faults::FaultCohesiveDyn::_calcRheologyTraction2D(scalar_array* traction
     } else {
       (*tractionRheology)[0] = -frictionStress;
     } // if/else
+    (*tractionRheology)[1] = tractionNormal;
     
     // Determine if flipping between sliding and locked (means need new Jacobian)
     if (slipMag < _zeroTolerance && frictionStress > 0.0 && tractionShearMag < _zeroTolerance) {
@@ -1200,6 +1228,7 @@ pylith::faults::FaultCohesiveDyn::_calcRheologyTraction3D(scalar_array* traction
       (*tractionRheology)[0] = -frictionStress * tractionInternal[0] / tractionShearMag;
       (*tractionRheology)[1] = -frictionStress * tractionInternal[1] / tractionShearMag;
     } // if/else
+    (*tractionRheology)[2] = tractionNormal;
     
     // Determine if flipping between sliding and locked (means need new Jacobian)
     if (slipMag < _zeroTolerance && frictionStress > 0.0 && tractionShearMag < _zeroTolerance) {
