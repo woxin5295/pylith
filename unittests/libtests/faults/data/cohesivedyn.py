@@ -1,5 +1,5 @@
-cell = "tri3d"
-testCase = "open"
+cell = "tri3"
+testCase = "slip"
 
 import numpy
 
@@ -16,7 +16,7 @@ def printdata(data):
     Print data as C array.
     """
     (nrows, ncols) = data.shape
-    style = " %16.12f,"*ncols
+    style = " %18.10e,"*ncols
     for row in xrange(nrows):
         print (style % tuple(data[row,:]))
     return
@@ -29,7 +29,7 @@ def globalToFault(v, R):
     """
     (m,ndof) = v.shape
 
-    vF = numpy.dot(C, v.reshape(m*ndof,1))
+    vF = numpy.dot(R, v.reshape(m*ndof,1))
     return vF.reshape((m, ndof))
 
 
@@ -40,25 +40,20 @@ def faultToGlobal(v, R):
     """
     (m,ndof) = v.shape
 
-    vG = numpy.dot(C.transpose(), v.reshape(m*ndof,1))
+    vG = numpy.dot(R.transpose(), v.reshape(m*ndof,1))
     return vG.reshape((m, ndof))
 
 
 # ----------------------------------------------------------------------
 if cell == "tri3" or cell == "tri3d" or cell == "quad4":
     if cell == "tri3":
-        dlagrange1 = numpy.zeros(2)
-        indexL = numpy.arange(12,16)
-        indexN = numpy.arange(2,6)
-        indexP = numpy.arange(8,12)
-        n = 16
-        m = 4
+        indexL = numpy.arange(6,8)
+        indexN = numpy.arange(1,3)
+        indexP = numpy.arange(4,6)
+        n = 8
+        m = 2
         DOF = 2
 
-        fieldT = numpy.array([[-8.6, 9.6],
-                              [-8.8, 9.8]])
-        fieldIncr = numpy.array([[-1.6, 2.6],
-                                 [-1.8, 2.8]])
         L = numpy.array([[1.0, 0.0, 0.0, 0.0,],
                          [0.0, 1.0, 0.0, 0.0,],
                          [0.0, 0.0, 1.0, 0.0,],
@@ -68,45 +63,42 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
                          [0.0, 0.0, 0.0, +1.0,],
                          [0.0, 0.0, +1.0, 0.0,],]);
     
-        jacobianN = numpy.array(
-            [[   4.0,  -1.2,  -2.2,  -2.3,],
-             [  -1.2,   5.0,  -1.3,  -3.2,],
-             [  -2.2,  -1.3,   4.1,  -4.3,],
-             [  -2.3,  -3.2,  -4.3,   5.1,],])
+        fieldT = numpy.array([[ 8.1, 9.1,],
+                              [ 8.2, 9.2,],
+                              [ 8.3, 9.3,],
+                              [ 8.4, 9.4,],
+                              [ 8.2, 9.2,],
+                              [ 8.3, 9.3,],
+                              [-8.6, 9.6,],
+                              [-8.8, 9.8,],])
 
-        jacobianP = numpy.array(
-            [[   5.0,  -1.2,  -2.2,  -2.3,],
-             [  -1.2,   4.0,  -1.3,  -3.2,],
-             [  -2.2,  -1.3,   5.1,  -4.3,],
-             [  -2.3,  -3.2,  -4.3,   4.1,],])
-
-        disp = numpy.array([[ 8.1, 9.1,],
-                            [ 8.2, 9.2,],
-                            [ 8.3, 9.3,],
-                            [ 8.4, 9.4,],
-                            [ 8.2, 9.2,],
-                            [ 8.3, 9.3,],
-                            [-8.6, 9.6,],
-                            [-8.8, 9.8,],])
-
-        if testCase == "slip":
-            dispIncr = numpy.array([[ 9.1, 7.1,],
-                                    [ 9.2, 7.2,],
-                                    [ 9.3, 7.3,],
-                                    [ 9.4, 7.4,],
-                                    [ 9.2, 7.2,],
-                                    [ 9.3, 7.3,],
-                                    [-1.6, 2.6,],
-                                    [-1.8, 2.8,],])            
+        if testCase == "stick":
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [-21.6, 2.6,],
+                                      [-21.8, 2.8,],])            
+        elif testCase == "slip":
+            fieldTIncr = numpy.array([[ 9.1, 7.1,],
+                                      [ 9.2, 7.2,],
+                                      [ 9.3, 7.3,],
+                                      [ 9.4, 7.4,],
+                                      [ 9.2, 7.5,],
+                                      [ 9.3, 7.6,],
+                                      [-1.6, 2.6,],
+                                      [-1.8, 2.8,],])            
         elif testCase == "open":
-            dispIncr = numpy.array([[ 9.1, 7.1,],
-                                    [ 9.2, 7.2,],
-                                    [ 9.3, 7.3,],
-                                    [ 9.4, 7.4,],
-                                    [ 9.2, 7.2,],
-                                    [ 9.3, 7.3,],
-                                    [ +10.6, -10.6,],
-                                    [ +10.8, -10.8,],])            
+            fieldTIncr = numpy.array([[ 9.1, 7.1,],
+                                      [ 9.2, 7.2,],
+                                      [ 9.3, 7.3,],
+                                      [ 9.4, 7.4,],
+                                      [ 9.5, 7.5,],
+                                      [ 9.6, 7.6,],
+                                      [ +10.6, -10.6,],
+                                      [ +10.8, -10.8,],])            
 
 
     elif cell == "tri3d":
@@ -139,22 +131,6 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
                          [0.0, 0.0, 0.0, 0.0, -1.0, 0.0,],
                          [0.0, 0.0, 0.0, 0.0, 0.0, +1.0,],])
     
-        jacobianN = numpy.array(
-            [[+6.0, -1.0, -1.1, -1.2, -1.3, -1.4],
-             [-1.0, +6.1, -0.9, -0.8, -0.7, -0.6],
-             [-1.1, -0.9, +6.2, -2.1,  0.0,  0.0],
-             [-1.2, -0.8, -2.1, +6.3,  0.0,  0.0],
-             [-1.3, -0.7,  0.0,  0.0, +6.4, -1.1],
-             [-1.4, -0.6,  0.0,  0.0, -1.1, +6.5]])
-
-        jacobianP = numpy.array(
-            [[+5.0, -1.0, -1.1, -1.2, -1.3, -1.4],
-             [-1.0, +5.1, -0.9, -0.8, -0.7, -0.6],
-             [-1.1, -0.9, +5.2, -2.1,  0.0,  0.0],
-             [-1.2, -0.8, -2.1, +5.3,  0.0,  0.0],
-             [-1.3, -0.7,  0.0,  0.0, +5.4, -1.1],
-             [-1.4, -0.6,  0.0,  0.0, -1.1, +5.5]])
-
         disp = numpy.array([[ 6.1, 8.1,],
                             [ 6.2, 8.2,],
                             [ 6.3, 8.3,],
@@ -218,17 +194,6 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
                          [0.0, 0.0, 0.0, +1.0,],
                          [0.0, 0.0, +1.0, 0.0,],]);
     
-        jacobianN = numpy.array(
-            [[   4.0,  -1.2,  -2.2,  -2.3,],
-             [  -1.2,   5.0,  -1.3,  -3.2,],
-             [  -2.2,  -1.3,   4.1,  -4.3,],
-             [  -2.3,  -3.2,  -4.3,   5.1,],])
-
-        jacobianP = numpy.array(
-            [[   5.0,  -1.2,  -2.2,  -2.3,],
-             [  -1.2,   4.0,  -1.3,  -3.2,],
-             [  -2.2,  -1.3,   5.1,  -4.3,],
-             [  -2.3,  -3.2,  -4.3,   4.1,],])
 
         disp = numpy.array([[ 8.1, 9.1,],
                             [ 8.3, 9.3,],
@@ -268,71 +233,31 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
     # ------------------------------------------------------------------
     lagrangeScale = lengthScale**1
 
-    fieldTpdt = fieldT + fieldIncr
+    fieldTpdt = (fieldT + fieldTIncr) / lengthScale
+    fieldTpdtFault = globalToFault(fieldTpdt[indexL,:], C)
 
-    fieldTpdt = globalToFault(fieldTpdt, C)
-
-    tractionShear = abs(fieldTpdt[:,0])
-    tractionNormal = fieldTpdt[:,1]
+    tractionShear = abs(fieldTpdtFault[:,0])
+    tractionNormal = fieldTpdtFault[:,1]
 
     print "tractionShear",tractionShear
     print "tractionNormal",tractionNormal
 
-    friction = -0.6 * tractionNormal;
+    tractionRheologyFault = numpy.zeros((m, DOF))
+    tractionRheologyFault[:,0] = -0.6 * tractionNormal;
+    tractionRheologyFault[:,1] = tractionNormal
+    print "tractionRheology",tractionRheologyFault
 
-    print "friction",friction
+    tractionRheology = faultToGlobal(tractionRheologyFault, C)
+    tractionInternal = fieldTpdt[indexL,:]
+    tractionResidual = tractionRheology - tractionInternal
+    print "tractionResidual",tractionResidual
 
-    dlagrange0 = (friction - tractionShear) * fieldTpdt[:,0] / tractionShear
-  
-    print "dlagrange0",dlagrange0
+    residual = numpy.zeros(fieldT.shape)
+    residual[indexN,:] = +tractionResidual
+    residual[indexP,:] = -tractionResidual
+    residual[indexL,:] = tractionInternal * (fieldTpdt[indexP,:] - fieldTpdt[indexN,:]) * lagrangeScale
 
-    if testCase == "slip": 
-        dLagrange = numpy.vstack((dlagrange0, dlagrange1))
-        dLagrange = numpy.transpose(dLagrange)
-        dLagrange = faultToGlobal(dLagrange, C).reshape(m)
-    elif testCase == "open":
-        dLagrange = numpy.reshape(disp+dispIncr, n)
-        dLagrange = -dLagrange[indexL]
-
-    print "dLagrange \n", dLagrange
-
-    L /= lengthScale**1
-    RHS = numpy.dot(numpy.transpose(L),dLagrange)
-    print "RHS",RHS
-    duN = numpy.dot(inv(jacobianN),RHS)
-    duP = -numpy.dot(inv(jacobianP),RHS)
-    
-    dispRelIncr = duP - duN
-
-    dispTpdt = disp + dispIncr
-    dispTpdt = numpy.reshape(dispTpdt, n)
-
-    slipVertex = dispRelIncr + dispTpdt[indexP]-dispTpdt[indexN]
-    slipVertex = numpy.reshape(slipVertex, (m/DOF,DOF))
-    slipVertex = globalToFault(slipVertex, C)
-    mask = slipVertex[:,1] < 0.0
-    #slipVertex[:,1] = 0
-    print "slip",slipVertex
-    slipVertex = faultToGlobal(slipVertex, C)
-    slipVertex = numpy.reshape(slipVertex, m)
-    disp = numpy.reshape(disp, n)
-    slipIncrVertex = slipVertex - (disp[indexP] - disp[indexN])
-
-    print "duN \n", duN
-    print "duP \n", duP
-
-    dispIncrE = dispIncr
-    dispIncrE = numpy.reshape(dispIncrE, n)
-    dispIncrE[indexL] = dispIncrE[indexL] + dLagrange
-    dispIncrE[indexN] = dispIncrE[indexN] - 0.5*slipIncrVertex
-    dispIncrE[indexP] = dispIncrE[indexP] + 0.5*slipIncrVertex
-    dispIncrE = numpy.reshape(dispIncrE, (n/DOF,DOF))
-
-    slipVertex = numpy.reshape(slipVertex, (m/DOF,DOF))
-    slipVertex = globalToFault(slipVertex, C)
-
-    print "dispIncrE\n", printdata(dispIncrE)
-    print "slipVertexE\n", printdata(slipVertex)
+    print "residual \n",printdata(residual)
 
 
 # ----------------------------------------------------------------------

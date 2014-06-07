@@ -240,17 +240,17 @@ const PylithScalar pylith::faults::CohesiveDynDataTri3::_jacobian[] = {
 // Computed values
 // ----------------------------------------------------------------------
 
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_orientation[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_orientation[2*2*2] = {
   0.0, +1.0,  +1.0, 0.0,
   0.0, +1.0,  +1.0, 0.0
 };
 
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_area[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_area[2] = {
   1.0,
   1.0,
 };
 
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_initialTractions[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_initialTractions[2*2] = {
   // Fault coordinate frame
   1.0, -2.0,
   1.1, -2.1,
@@ -258,18 +258,19 @@ const PylithScalar pylith::faults::CohesiveDynDataTri3::_initialTractions[] = {
 
 
 const int pylith::faults::CohesiveDynDataTri3::_numConstraintEdges = 2;
-const int pylith::faults::CohesiveDynDataTri3::_constraintEdges[] = {
+const int pylith::faults::CohesiveDynDataTri3::_constraintEdges[2] = {
   15, 16
 };
-const int pylith::faults::CohesiveDynDataTri3::_negativeVertices[] = {
+const int pylith::faults::CohesiveDynDataTri3::_negativeVertices[2] = {
   4, 5
 };
 
 // ----------------------------------------------------------------------
 // Stick case
 // ----------------------------------------------------------------------
+// Computed using cohesivedyn.py
 // Input
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrStick[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrStick[8*2] = {
   1.1, 2.1,
   1.2, 2.2, // 3
   1.3, 2.3, // 4
@@ -281,42 +282,42 @@ const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrStick[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_residualStickE[] = {
-  0.0, 0.0,
-  0.0, 0.001*(0.6*(21.6+8.6)-(9.6+2.6)), // 3
-  0.0, 0.001*(0.6*(21.8+8.8)-(9.8+2.8)), // 4
-  0.0, 0.0,
-  0.0, -0.001*(0.6*(21.6+8.6)-(9.6+2.6)), // 6
-  0.0, -0.001*(0.6*(21.8+8.8)-(9.8+2.8)), // 7
- -21.6, 2.6, // 15
- -21.8, 2.8, // 16
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_residualStickE[8*2] = {
+   0.0000000000e+00,   0.0000000000e+00,
+   0.0000000000e+00,   5.9200000000e-03,
+   0.0000000000e+00,   5.7600000000e-03,
+   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,  -5.9200000000e-03,
+  -0.0000000000e+00,  -5.7600000000e-03,
+  -0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   0.0000000000e+00,
 };
 
 // ----------------------------------------------------------------------
 // Slip case
 // ----------------------------------------------------------------------
 // Input
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrSlip[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrSlip[8*2] = {
   9.1, 7.1,
   9.2, 7.2, // 3
   9.3, 7.3, // 4
   9.4, 7.4,
-  9.2, 7.2, // 6
-  9.3, 7.3, // 7
+  9.2, 7.5, // 6
+  9.3, 7.6, // 7
  -1.6, 2.6, // 15
  -1.8, 2.8, // 16
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTri3::_residualSlipE[] = {
-   9.100000000000,   7.100000000000,
-   9.200000000000,   7.200190546440,
-   9.300000000000,   7.300983993112,
-   9.400000000000,   7.400000000000,
-   9.200000000000,   7.199809453560,
-   9.300000000000,   7.299016006888,
-  -1.600000000000,  -3.480000000000,
-  -1.800000000000,  -3.440000000000,
+const PylithScalar pylith::faults::CohesiveDynDataTri3::_residualSlipE[8*2] = {
+   0.0000000000e+00,   0.0000000000e+00,
+   0.0000000000e+00,  -6.0800000000e-03,
+   0.0000000000e+00,  -6.2400000000e-03,
+   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   6.0800000000e-03,
+  -0.0000000000e+00,   6.2400000000e-03,
+  -0.0000000000e+00,   3.6600000000e-03,
+  -0.0000000000e+00,   3.7800000000e-03,
 };
 
 // ----------------------------------------------------------------------
@@ -328,22 +329,22 @@ const PylithScalar pylith::faults::CohesiveDynDataTri3::_fieldIncrOpen[] = {
   9.2, 7.2, // 3
   9.3, 7.3, // 4
   9.4, 7.4,
-  9.2, 7.2, // 6
-  9.3, 7.3, // 7
+  9.5, 7.5, // 6
+  9.6, 7.6, // 7
   +10.6, -10.6, // 15
   +10.8, -10.8, // 16
 };
 
 // Output
 const PylithScalar pylith::faults::CohesiveDynDataTri3::_residualOpenE[] = {
-   9.100000000000,   7.100000000000,
-   9.199826714877,   7.200414257705,
-   9.299943020362,   7.300360547702,
-   9.400000000000,   7.400000000000,
-   9.200173285123,   7.199585742295,
-   9.300056979638,   7.299639452298,
-   8.600000000000,  -9.600000000000,
-   8.800000000000,  -9.800000000000,
+   0.0000000000e+00,   0.0000000000e+00,
+   0.0000000000e+00,  -2.0000000000e-04,
+   0.0000000000e+00,  -2.0000000000e-04,
+   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   2.0000000000e-04,
+  -0.0000000000e+00,   2.0000000000e-04,
+   6.0000000000e-04,  -3.0000000000e-04,
+   6.0000000000e-04,  -3.0000000000e-04,
 };
 
 // ----------------------------------------------------------------------
