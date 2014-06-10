@@ -362,8 +362,11 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     slipVertex = 0.0;
     slipRateVertex = 0.0;
     tractionInternalVertex = 0.0;
+    if (slipVertex[indexN] < _zeroTolerance || _openFreeSurf) {
+      tractionInternalVertex = tractionPerturbVertex;
+    } // if
+
     for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
-      tractionInternalVertex[iDim] = tractionPerturbVertex[iDim];
       
       for (PetscInt jDim = 0; jDim < spaceDim; ++jDim) {
         slipVertex[iDim] += orientationArray[ooff+iDim*spaceDim+jDim] * (dispTArray[dtpoff+jDim] + dispTIncrArray[dipoff+jDim] - dispTArray[dtnoff+jDim] - dispTIncrArray[dinoff+jDim]);
@@ -382,6 +385,7 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     _logger->eventEnd(computeEvent);
     _logger->eventBegin(updateEvent);
 #endif
+
     if (slipVertex[indexN] < _zeroTolerance || !_openFreeSurf) { 
       // If no opening or flag indicates to still impose tractions
       // when fault is open, then assemble contributions into field
@@ -400,62 +404,50 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
 	_needNewJacobian = true;
       } // if
 
-      tractionRheologyGlobalVertex = 0.0;
-      tractionInternalGlobalVertex = 0.0;
-      for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
-	tractionContactArray[coff+iDim] = tractionRheologyVertex[iDim] - tractionInternalVertex[iDim];
+    } else {
+      tractionRheologyVertex = 0.0;
+    } // if/else
 
-	for (PetscInt jDim = 0; jDim < spaceDim; ++jDim) {
-	  tractionRheologyGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionRheologyVertex[jDim];
-	  tractionInternalGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionInternalVertex[jDim];
-	} // for
+    tractionRheologyGlobalVertex = 0.0;
+    tractionInternalGlobalVertex = 0.0;
+    for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
+      tractionContactArray[coff+iDim] = tractionRheologyVertex[iDim] - tractionInternalVertex[iDim];
+
+      for (PetscInt jDim = 0; jDim < spaceDim; ++jDim) {
+	tractionRheologyGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionRheologyVertex[jDim];
+	tractionInternalGlobalVertex[iDim] += orientationArray[ooff+jDim*spaceDim+iDim] * tractionInternalVertex[jDim];
       } // for
+    } // for
 
-      for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
-	const PylithScalar tractionTerm = areaArray[aoff] * (tractionRheologyGlobalVertex[iDim] - tractionInternalGlobalVertex[iDim]);
-	residualArray[rnoff+iDim] += tractionTerm;
-	residualArray[rpoff+iDim] -= tractionTerm;
+    for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
+      const PylithScalar tractionTerm = areaArray[aoff] * (tractionRheologyGlobalVertex[iDim] - tractionInternalGlobalVertex[iDim]);
+      residualArray[rnoff+iDim] += tractionTerm;
+      residualArray[rpoff+iDim] -= tractionTerm;
 
-	const PylithScalar dispRelVertex = dispTArray[dtpoff+iDim] + dispTIncrArray[dipoff+iDim] - dispTArray[dtnoff+iDim] - dispTIncrArray[dinoff+iDim];
-	residualArray[rloff+iDim] += areaArray[aoff] * tractionInternalGlobalVertex[iDim] * dispRelVertex;
-      } // for
+      const PylithScalar dispRelVertexComp = dispTArray[dtpoff+iDim] + dispTIncrArray[dipoff+iDim] - dispTArray[dtnoff+iDim] - dispTIncrArray[dinoff+iDim];
+      residualArray[rloff+iDim] += areaArray[aoff] * tractionInternalGlobalVertex[iDim] * dispRelVertexComp;
+    } // for
 
 #if 1 // DEBUGGING
-	std::cout << "v_fault: " << v_fault
-		  << ", v_neg: " << v_negative
-		  << ", v_pos: " << v_positive
-		  << ", e_lagrange: " << e_lagrange
-		  << ", area: " << areaArray[aoff]
-		  << ", T_f: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyVertex[iDim]; }
-	std::cout << "), T_i: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalVertex[iDim]; }
-	std::cout << "), T_fg: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyGlobalVertex[iDim]; }
-	std::cout << "), T_ig: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalGlobalVertex[iDim]; }
-	std::cout << "), residual_neg: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rnoff+iDim]; }
-	std::cout << "), residual_pos: (";
-	for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rpoff+iDim]; }
-	std::cout << std::endl;
+    std::cout << "v_fault: " << v_fault
+	      << ", v_neg: " << v_negative
+	      << ", v_pos: " << v_positive
+	      << ", e_lagrange: " << e_lagrange
+	      << ", area: " << areaArray[aoff]
+	      << ", T_f: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyVertex[iDim]; }
+    std::cout << "), T_i: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalVertex[iDim]; }
+    std::cout << "), T_fg: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionRheologyGlobalVertex[iDim]; }
+    std::cout << "), T_ig: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << tractionInternalGlobalVertex[iDim]; }
+    std::cout << "), residual_neg: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rnoff+iDim]; }
+    std::cout << "), residual_pos: (";
+    for (int iDim=0; iDim < spaceDim; ++iDim) { std::cout << " " << residualArray[rpoff+iDim]; }
+    std::cout << ")" << std::endl;
 #endif
-    } else { // opening, normal traction should be zero
-      std::cout << "Opening" << std::endl;
-      for (PetscInt iDim = 0; iDim < spaceDim; ++iDim) {
-	tractionContactArray[coff+iDim] = 0.0;
-      } // for
-
-      std::ostringstream msg;
-      if (fabs(tractionInternalVertex[indexN]) > _zeroTolerance) {
-        msg << "ERROR! Fault opening with nonzero traction."
-                  << ", v_fault: " << v_fault
-                  << ", opening: " << slipVertex[indexN]
-                  << ", normal traction: " << tractionInternalVertex[indexN]
-                  << std::endl;
-        throw std::runtime_error(msg.str());
-      } // if
-    }  // if/else
 
 #if defined(DETAILED_EVENT_LOGGING)
     _logger->eventEnd(updateEvent);
