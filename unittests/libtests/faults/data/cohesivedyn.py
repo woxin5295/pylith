@@ -1,5 +1,5 @@
-cell = "tri3"
-testCase = "slip"
+cell = "tri3d"
+testCase = "open"
 
 import numpy
 
@@ -45,7 +45,7 @@ def faultToGlobal(v, R):
 
 
 # ----------------------------------------------------------------------
-if cell == "tri3" or cell == "tri3d" or cell == "quad4":
+if cell in ["tri3", "tri3d", "quad4"]:
     if cell == "tri3":
         indexL = numpy.arange(6,8)
         indexN = numpy.arange(1,3)
@@ -82,14 +82,14 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
                                       [-21.6, 2.6,],
                                       [-21.8, 2.8,],])            
         elif testCase == "slip":
-            fieldTIncr = numpy.array([[ 9.1, 7.1,],
-                                      [ 9.2, 7.2,],
-                                      [ 9.3, 7.3,],
-                                      [ 9.4, 7.4,],
-                                      [ 9.2, 7.5,],
-                                      [ 9.3, 7.6,],
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
                                       [-1.6, 2.6,],
-                                      [-1.8, 2.8,],])            
+                                      [-1.8, 2.5,],])            
         elif testCase == "open":
             fieldTIncr = numpy.array([[ 9.1, 7.1,],
                                       [ 9.2, 7.2,],
@@ -102,28 +102,16 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
 
 
     elif cell == "tri3d":
-        dlagrange1 = numpy.zeros(3)
-        indexL = numpy.array([18, 19, 20, 21, 22, 23])
-        indexN = numpy.array([2, 3, 4, 5, 8, 9])
-        indexP = numpy.array([12, 13, 14, 15, 16, 17])
-        n = 24
-        m = 6
+        indexL = numpy.array([9, 10, 11])
+        indexN = numpy.array([1, 2, 4])
+        indexP = numpy.array([6, 7, 8])
+        n = 12
+        m = 3
         DOF = 2
 
-        fieldT = numpy.array([[-3.8,-4.8],
-                              [-3.0, 4.0],
-                              [3.2, -4.2]])
-        fieldIncr = numpy.array([[-1.8,+3.6],
-                                 [-1.0, 1.1],
-                                 [ 1.7,-1.2]])
-
-        L = numpy.array([[2.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                         [0.0, 2.0, 0.0, 0.0, 0.0, 0.0],
-                         [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-                         [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-                         [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
-                         [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
-
+        L = numpy.array([[2.0, 0.0, 0.0],
+                         [0.0, 1.0, 0.0],
+                         [0.0, 0.0, 1.0],])
         C = numpy.array([[-0.70710678118654757, +0.70710678118654757, 0.0, 0.0, 0.0, 0.0,],
                          [+0.70710678118654757, +0.70710678118654757, 0.0, 0.0, 0.0, 0.0,],
                          [0.0, 0.0, 0.0, +1.0, 0.0, 0.0,],
@@ -131,103 +119,119 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
                          [0.0, 0.0, 0.0, 0.0, -1.0, 0.0,],
                          [0.0, 0.0, 0.0, 0.0, 0.0, +1.0,],])
     
-        disp = numpy.array([[ 6.1, 8.1,],
-                            [ 6.2, 8.2,],
-                            [ 6.3, 8.3,],
-                            [ 6.4, 8.4,],
-                            [ 6.5, 8.5,],
-                            [ 6.6, 8.6,],
-                            [ 6.2, 8.2,],
-                            [ 6.3, 8.3,],
-                            [ 6.5, 8.5,],
-                            [-3.8,-4.8,],
-                            [-3.0, 4.0,],
-                            [ 3.2,-4.2,],])
+        fieldT = numpy.array([[ 6.1, 8.1,],
+                              [ 6.2, 8.2,],
+                              [ 6.3, 8.3,],
+                              [ 6.4, 8.4,],
+                              [ 6.5, 8.5,],
+                              [ 6.6, 8.6,],
+                              [ 6.2, 8.2,],
+                              [ 6.3, 8.3,],
+                              [ 6.5, 8.5,],
+                              [-3.8,-4.8,],
+                              [-3.0, 4.0,],
+                              [ 3.2,-4.2,],])
 
-        if testCase == "slip":
-            dispIncr = numpy.array([[ 1.1, 2.1,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.4, 2.4,],
-                                    [ 1.5, 2.5,],
-                                    [ 1.6, 2.6,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.5, 2.5,],
-                                    [-1.8,+3.6,],
-                                    [-1.0, 1.1,],
-                                    [ 1.7,-1.2,],])            
+        if testCase == "stick":
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [-21.8,-22.8,],
+                                      [-21.0, 2.0,],
+                                      [ 2.2,-22.2,],])            
+        elif testCase == "slip":
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [-1.8,+3.6,],
+                                      [-1.0, 1.1,],
+                                      [ 1.7,-1.2,],])            
         elif testCase == "open":
-            dispIncr = numpy.array([[ 1.1, 2.1,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.4, 2.4,],
-                                    [ 1.5, 2.5,],
-                                    [ 1.6, 2.6,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.5, 2.5,],
-                                    [+11.8, 11.8,],
-                                    [+10.0, 0.1,],
-                                    [ 1.2, +10.2,],])            
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [+11.8, 11.8,],
+                                      [+10.0, 0.1,],
+                                      [ 1.2, +10.2,],])            
 
 
     elif cell == "quad4":
-        dlagrange1 = numpy.zeros(2)
-        indexL = numpy.arange(16,20)
-        indexN = numpy.arange(4,8)
-        indexP = numpy.arange(12,16)
-        n = 20
-        m = 4
+        indexL = numpy.arange(8,10)
+        indexN = numpy.arange(2,4)
+        indexP = numpy.arange(6,8)
+        n = 10
+        m = 2
         DOF = 2
 
-        fieldT = numpy.array([[-8.6, 9.6],
-                              [-8.8, 9.8]])
-        fieldIncr = numpy.array([[-1.6, 2.6],
-                                 [-1.8, 2.5]])
-        L = numpy.array([[1.0, 0.0, 0.0, 0.0,],
-                         [0.0, 1.0, 0.0, 0.0,],
-                         [0.0, 0.0, 1.0, 0.0,],
-                         [0.0, 0.0, 0.0, 1.0,],]);
+        L = numpy.array([1.0, 1.0, 1.0, 1.0,]);
         C = numpy.array([[0.0, +1.0, 0.0, 0.0,],
                          [+1.0, 0.0, 0.0, 0.0,],
                          [0.0, 0.0, 0.0, +1.0,],
                          [0.0, 0.0, +1.0, 0.0,],]);
     
 
-        disp = numpy.array([[ 8.1, 9.1,],
-                            [ 8.3, 9.3,],
-                            [ 8.2, 9.2,],
-                            [ 8.3, 9.3,],
-                            [ 8.5, 9.5,],
-                            [ 8.6, 9.6,],
-                            [ 8.2, 9.6,],
-                            [ 8.3, 9.8,],
-                            [-8.6, 9.6,],
-                            [-8.8, 9.8,],])
+        fieldT = numpy.array([[ 8.1, 9.1,],
+                              [ 8.3, 9.3,],
+                              [ 8.2, 9.2,],
+                              [ 8.3, 9.3,],
+                              [ 8.5, 9.5,],
+                              [ 8.6, 9.6,],
+                              [ 8.2, 9.6,],
+                              [ 8.3, 9.8,],
+                              [-8.6, 9.6,],
+                              [-8.8, 9.8,],])
 
-        if testCase == "slip":
-            dispIncr = numpy.array([[ 1.1, 2.1,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.5, 2.5,],
-                                    [ 1.6, 2.6,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [-1.6, 2.6,],
-                                    [-1.8, 2.5,],])            
+        if testCase == "stick":
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.4, 2.4,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [-21.6, 2.6,],
+                                      [-21.8, 2.5,],])
+        elif testCase == "slip":
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [-1.6, 2.6,],
+                                      [-1.8, 2.5,],])
         elif testCase == "open":
-            dispIncr = numpy.array([[ 1.1, 2.1,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [ 1.5, 2.5,],
-                                    [ 1.6, 2.6,],
-                                    [ 1.2, 2.2,],
-                                    [ 1.3, 2.3,],
-                                    [+10.6, -12.6,],
-                                    [+10.8, -12.8,],])            
+            fieldTIncr = numpy.array([[ 1.1, 2.1,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.2, 2.2,],
+                                      [ 1.3, 2.3,],
+                                      [ 1.5, 2.5,],
+                                      [ 1.6, 2.6,],
+                                      [ 1.3, 2.7,],
+                                      [ 1.4, 2.6,],
+                                      [+10.6, -2.6,],
+                                      [+10.8, -2.8,],])
 
 
     # ------------------------------------------------------------------
@@ -236,26 +240,31 @@ if cell == "tri3" or cell == "tri3d" or cell == "quad4":
     fieldTpdt = (fieldT + fieldTIncr) / lengthScale
     fieldTpdtFault = globalToFault(fieldTpdt[indexL,:], C)
 
-    tractionShear = abs(fieldTpdtFault[:,0])
+    tractionShear = fieldTpdtFault[:,0]
     tractionNormal = fieldTpdtFault[:,1]
+
+    print "fieldTpdt",fieldTpdt
 
     print "tractionShear",tractionShear
     print "tractionNormal",tractionNormal
 
     tractionRheologyFault = numpy.zeros((m, DOF))
-    tractionRheologyFault[:,0] = -0.6 * tractionNormal;
-    tractionRheologyFault[:,1] = tractionNormal
-    print "tractionRheology",tractionRheologyFault
+    if testCase != "open":
+        tractionRheologyFault[:,0] = -0.6 * tractionNormal * tractionShear/numpy.abs(tractionShear)
+        tractionRheologyFault[:,1] = tractionNormal
+    print "tractionRheologyFault",tractionRheologyFault
 
     tractionRheology = faultToGlobal(tractionRheologyFault, C)
     tractionInternal = fieldTpdt[indexL,:]
     tractionResidual = tractionRheology - tractionInternal
+    print "tractionRheology",tractionRheology
+    print "tractionInternal",tractionInternal
     print "tractionResidual",tractionResidual
 
     residual = numpy.zeros(fieldT.shape)
-    residual[indexN,:] = +tractionResidual
-    residual[indexP,:] = -tractionResidual
-    residual[indexL,:] = tractionInternal * (fieldTpdt[indexP,:] - fieldTpdt[indexN,:]) * lagrangeScale
+    residual[indexN,:] = +numpy.dot(L, tractionResidual)
+    residual[indexP,:] = -numpy.dot(L, tractionResidual)
+    residual[indexL,:] = numpy.dot(L, tractionInternal) * (fieldTpdt[indexP,:] - fieldTpdt[indexN,:]) * lagrangeScale
 
     print "residual \n",printdata(residual)
 
