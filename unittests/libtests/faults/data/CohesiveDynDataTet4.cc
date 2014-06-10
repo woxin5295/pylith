@@ -88,7 +88,7 @@ const char* pylith::faults::CohesiveDynDataTet4::_label = "fault";
 const char* pylith::faults::CohesiveDynDataTet4::_initialTractFilename = 
   "data/tet4_initialtract.spatialdb";
 
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldT[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldT[11*3] = {
   7.1, 8.1, 9.1,
   7.2, 8.2, 9.2, // 4
   7.3, 8.3, 9.3, // 5
@@ -472,19 +472,19 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_jacobian[] = {
 // Computed values
 // ----------------------------------------------------------------------
 
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_orientation[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_orientation[3*3*3] = {
   0.0, +1.0, 0.0,    0.0, 0.0, +1.0,    +1.0, 0.0, 0.0,
   0.0, +1.0, 0.0,    0.0, 0.0, +1.0,    +1.0, 0.0, 0.0,
   0.0, +1.0, 0.0,    0.0, 0.0, +1.0,    +1.0, 0.0, 0.0,
 };
 
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_area[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_area[3] = {
   1.0/3.0, 
   1.0/3.0, 
   1.0/3.0,
 };
 
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_initialTractions[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_initialTractions[3*3] = {
   // Fault coordinate frame
   +1.0, +2.0, -3.0,
   +1.1, +2.1, -3.1,
@@ -493,10 +493,10 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_initialTractions[] = {
 
 
 const int pylith::faults::CohesiveDynDataTet4::_numConstraintEdges = 3;
-const int pylith::faults::CohesiveDynDataTet4::_constraintEdges[] = {
+const int pylith::faults::CohesiveDynDataTet4::_constraintEdges[3] = {
   34, 35, 36
 };
-const int pylith::faults::CohesiveDynDataTet4::_negativeVertices[] = {
+const int pylith::faults::CohesiveDynDataTet4::_negativeVertices[3] = {
    4,  5,  6
 };
 
@@ -504,7 +504,7 @@ const int pylith::faults::CohesiveDynDataTet4::_negativeVertices[] = {
 // Stick case
 // ----------------------------------------------------------------------
 // Input
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrStick[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrStick[11*3] = {
   1.1, 2.1, 3.1,
   1.2, 2.2, 3.2, // 4
   1.3, 2.3, 3.3, // 5
@@ -519,84 +519,84 @@ const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrStick[] = {
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualStickE[] = {
-  1.1, 2.1, 3.1,
-  1.2, 2.2, 3.2, // 4
-  1.3, 2.3, 3.3, // 5
-  1.4, 2.4, 3.4, // 6
-  1.5, 2.5, 3.5,
-  1.2, 2.2, 3.2, // 8
-  1.3, 2.3, 3.3, // 9
-  1.4, 2.4, 3.4, // 10
- -81.7, 2.7, 3.7, // 34
- -81.9, 2.9, 3.9, // 35
- -81.1, 2.1, 3.1, // 36
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualStickE[11*3] = {
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+   0.0000000000e+00,   4.9332948625e-06,   5.3943504571e-06,
+   0.0000000000e+00,   4.8643070839e-06,   5.3105737889e-06,
+   0.0000000000e+00,   5.1384640949e-06,   5.6472229161e-06,
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,  -4.9332948625e-06,  -5.3943504571e-06,
+  -0.0000000000e+00,  -4.8643070839e-06,  -5.3105737889e-06,
+  -0.0000000000e+00,  -5.1384640949e-06,  -5.6472229161e-06,
+  -0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
 };
 
 // ----------------------------------------------------------------------
 // Slip case
 // ----------------------------------------------------------------------
 // Input
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrSlip[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrSlip[11*3] = {
   1.1, 2.1, 3.1,
   1.2, 2.2, 3.2, // 4
   1.3, 2.3, 3.3, // 5
   1.4, 2.4, 3.4, // 6
   1.5, 2.5, 3.5,
-  1.2, 2.2, 3.2, // 7
-  1.3, 2.3, 3.3, // 8
-  1.4, 2.4, 3.4, // 10
+  1.2, 2.5, 3.4, // 7
+  1.3, 2.4, 3.5, // 8
+  1.4, 2.6, 3.6, // 10
  -4.7, 5.7, 6.7, // 34
  -4.9, 5.9, 6.9, // 35
  -4.1, 5.1, 6.1, // 36
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualSlipE[] = {
-   1.100000000000,   2.100000000000,   3.100000000000,
-   1.200000000000,   2.200000916680,   3.200000185945,
-   1.300000000000,   2.299999954294,   3.300000084646,
-   1.400000000000,   2.400000465197,   3.400000369651,
-   1.500000000000,   2.500000000000,   3.500000000000,
-   1.200000000000,   2.199999083320,   3.199999814055,
-   1.300000000000,   2.300000045706,   3.299999915354,
-   1.400000000000,   2.399999534803,   3.399999630349,
-  -4.700000000000, -13.650158708856, -14.236237291549,
-  -4.900000000000, -13.683824215808, -14.263164878373,
-  -4.100000000000, -13.548480328050, -14.156107942537,
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualSlipE[11*3] = {
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+   0.0000000000e+00,  -6.4500529030e-06,  -6.9787457638e-06,
+   0.0000000000e+00,  -6.5279414053e-06,  -7.0543882928e-06,
+   0.0000000000e+00,  -6.2161601093e-06,  -6.7520359808e-06,
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+  -0.0000000000e+00,   6.4500529030e-06,   6.9787457638e-06,
+  -0.0000000000e+00,   6.5279414053e-06,   7.0543882928e-06,
+  -0.0000000000e+00,   6.2161601093e-06,   6.7520359808e-06,
+  -0.0000000000e+00,   2.4400000000e-06,   1.7600000000e-06,
+  -0.0000000000e+00,   8.2666666667e-07,   1.7866666667e-06,
+  -0.0000000000e+00,   1.5466666667e-06,   1.6800000000e-06,
 };
 
 // ----------------------------------------------------------------------
 // Open case
 // ----------------------------------------------------------------------
 // Input
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrOpen[] = {
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_fieldIncrOpen[11*3] = {
   1.1, 2.1, 3.1,
   1.2, 2.2, 3.2, // 4
   1.3, 2.3, 3.3, // 5
   1.4, 2.4, 3.4, // 6
   1.5, 2.5, 3.5,
-  1.2, 2.2, 3.2, // 8
-  1.3, 2.3, 3.3, // 9
-  1.4, 2.4, 3.4, // 10
+  1.5, 3.2, 4.2, // 8
+  1.4, 3.3, 4.3, // 9
+  1.6, 3.4, 4.4, // 10
  +80.7, 2.7, 3.7, // 34
  +80.9, 2.9, 3.9, // 35
  +80.1, 2.1, 3.1, // 36
 };
 
 // Output
-const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualOpenE[] = {
-   1.100000000000,   2.100000000000,   3.100000000000,
-   1.199999161233,   2.200004202086,   3.200002477003,
-   1.299998110594,   2.300001999917,   3.300002482177,
-   1.400000000000,   2.400002588150,   3.400002474071,
-   1.500000000000,   2.500000000000,   3.500000000000,
-   1.200000838767,   2.199995797914,   3.199997522997,
-   1.300001889406,   2.299998000083,   3.299997517823,
-   1.400000000000,   2.399997411850,   3.399997525929,
-   7.700000000000, -18.700000000000, -19.700000000000,
-   7.900000000000, -18.900000000000, -19.900000000000,
-   7.100000000000, -18.100000000000, -19.100000000000,
+const PylithScalar pylith::faults::CohesiveDynDataTet4::_residualOpenE[11*3] = {
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+  -2.4333333333e-05,  -7.1333333333e-06,  -7.8000000000e-06,
+  -2.4333333333e-05,  -7.2666666667e-06,  -7.9333333333e-06,
+  -2.4333333333e-05,  -6.7333333333e-06,  -7.4000000000e-06,
+   0.0000000000e+00,   0.0000000000e+00,   0.0000000000e+00,
+   2.4333333333e-05,   7.1333333333e-06,   7.8000000000e-06,
+   2.4333333333e-05,   7.2666666667e-06,   7.9333333333e-06,
+   2.4333333333e-05,   6.7333333333e-06,   7.4000000000e-06,
+   7.3000000000e-06,   7.1333333333e-06,   7.8000000000e-06,
+   2.4333333333e-06,   7.2666666667e-06,   7.9333333333e-06,
+   4.8666666667e-06,   6.7333333333e-06,   7.4000000000e-06,
 };
 
 // ----------------------------------------------------------------------
