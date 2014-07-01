@@ -81,8 +81,8 @@ class TestApp(Script):
     from TestEqKinSrc import TestEqKinSrc
     suite.addTest(unittest.makeSuite(TestEqKinSrc))
 
-    from TestTractPerturbation import TestTractPerturbation
-    suite.addTest(unittest.makeSuite(TestTractPerturbation))
+    from TestTractionPerturbation import TestTractionPerturbation
+    suite.addTest(unittest.makeSuite(TestTractionPerturbation))
 
     from TestFaultCohesiveKin import TestFaultCohesiveKin
     suite.addTest(unittest.makeSuite(TestFaultCohesiveKin))

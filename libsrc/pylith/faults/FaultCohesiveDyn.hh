@@ -109,6 +109,18 @@ public :
 			 const PylithScalar t,
 			 topology::SolutionFields* const fields);
 
+  /** Integrate contributions to Jacobian matrix (A) associated with
+   * operator that require assembly across processors.
+   *
+   * @param jacobian Sparse matrix
+   * @param t Current time
+   * @param fields Solution fields
+   */
+  virtual
+  void integrateJacobian(topology::Jacobian* jacobian,
+			 const PylithScalar t,
+			 topology::SolutionFields* const fields);
+
   /** Update state variables as needed.
    *
    * @param t Current time

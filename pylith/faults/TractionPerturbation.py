@@ -16,24 +16,24 @@
 # ----------------------------------------------------------------------
 #
 
-## @file pylith/faults/TractPerturbation.py
+## @file pylith/faults/TractionPerturbation.py
 ##
 
 ## @brief Python object for managing parameters for a kinematic
 ## earthquake sources.
 ##
-## TractPerturbation is responsible for providing the value of
+## TractionPerturbation is responsible for providing the value of
 ## specified traction at time t over a fault surface.
 ##
 ## Factory: eq_kinematic_src
 
 from pylith.bc.TimeDependent import TimeDependent
-from faults import TractPerturbation as ModuleTractPerturbation
+from faults import TractionPerturbation as ModuleTractionPerturbation
 
 from pylith.utils.NullComponent import NullComponent
 
-# TractPerturbation class
-class TractPerturbation(TimeDependent, ModuleTractPerturbation):
+# TractionPerturbation class
+class TractionPerturbation(TimeDependent, ModuleTractionPerturbation):
   """
   Python object for managing specified tractions on a fault surface.
 
@@ -78,7 +78,7 @@ class TractPerturbation(TimeDependent, ModuleTractPerturbation):
     """
     Create handle to corresponding C++ object.
     """
-    ModuleTractPerturbation.__init__(self)
+    ModuleTractionPerturbation.__init__(self)
     return
   
 
@@ -86,9 +86,9 @@ class TractPerturbation(TimeDependent, ModuleTractPerturbation):
 
 def traction_perturbation():
   """
-  Factory associated with TractPerturbation.
+  Factory associated with TractionPerturbation.
   """
-  return TractPerturbation()
+  return TractionPerturbation()
 
 
 # End of file 

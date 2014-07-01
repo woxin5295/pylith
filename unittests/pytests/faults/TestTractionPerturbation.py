@@ -16,25 +16,25 @@
 # ======================================================================
 #
 
-## @file unittests/pytests/faults/TestTractPerturbation.py
+## @file unittests/pytests/faults/TestTractionPerturbation.py
 
-## @brief Unit testing of TractPerturbation object.
+## @brief Unit testing of TractionPerturbation object.
 
 import unittest
 
-from pylith.faults.TractPerturbation import TractPerturbation
+from pylith.faults.TractionPerturbation import TractionPerturbation
 
 # ----------------------------------------------------------------------
-class TestTractPerturbation(unittest.TestCase):
+class TestTractionPerturbation(unittest.TestCase):
   """
-  Unit testing of TractPerturbation object.
+  Unit testing of TractionPerturbation object.
   """
 
   def test_constructor(self):
     """
     Test constructor.
     """
-    tract = TractPerturbation()
+    tract = TractionPerturbation()
     return
 
 
@@ -62,7 +62,7 @@ class TestTractPerturbation(unittest.TestCase):
     dbChange.inventory.label = "traction change"
     dbChange._configure()
     
-    tract = TractPerturbation()
+    tract = TractionPerturbation()
     tract.inventory.dbInitial = dbInitial
     tract.inventory.dbChange = dbChange
     tract._configure()
@@ -73,7 +73,7 @@ class TestTractPerturbation(unittest.TestCase):
     """
     Test factory method.
     """
-    from pylith.faults.TractPerturbation import traction_perturbation
+    from pylith.faults.TractionPerturbation import traction_perturbation
     fn = traction_perturbation()
     return
 

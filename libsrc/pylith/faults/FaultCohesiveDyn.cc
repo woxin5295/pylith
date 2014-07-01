@@ -463,6 +463,167 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
   PYLITH_METHOD_END;
 } // integrateResidual
 
+
+// ----------------------------------------------------------------------
+// Compute Jacobian matrix (A) associated with operator.
+void
+pylith::faults::FaultCohesiveDyn::integrateJacobian(topology::Jacobian* jacobian,
+						    const PylithScalar t,
+						    topology::SolutionFields* const fields)
+{ // integrateJacobian
+  PYLITH_METHOD_BEGIN;
+
+  assert(jacobian);
+  assert(fields);
+  assert(_fields);
+  assert(_logger);
+
+  const int setupEvent = _logger->eventId("FaIJ setup");
+  const int geometryEvent = _logger->eventId("FaIJ geometry");
+  const int computeEvent = _logger->eventId("FaIJ compute");
+  const int restrictEvent = _logger->eventId("FaIJ restrict");
+  const int updateEvent = _logger->eventId("FaIJ update");
+
+  _logger->eventBegin(setupEvent);
+
+  // Add constraint information to Jacobian matrix; Entries are
+  // associated with vertices ik, jk, ki, and kj.
+
+  // Get cell geometry information that doesn't depend on cell
+  const int spaceDim = _quadrature->spaceDim();
+
+  // Get fields.
+  topology::Field& area = _fields->get("area");
+  topology::VecVisitorMesh areaVisitor(area);
+  const PetscScalar* areaArray = areaVisitor.localArray();
+  
+  PetscDM solnDM = fields->solution().dmMesh();assert(solnDM);
+  PetscSection solnSection = fields->solution().petscSection();assert(solnSection);
+  PetscSection solnGlobalSection = NULL;
+  PetscErrorCode err = DMGetDefaultGlobalSection(solnDM, &solnGlobalSection);PYLITH_CHECK_ERROR(err);assert(solnGlobalSection);
+
+  // Get fault information
+  PetscDM dmMesh = fields->mesh().dmMesh();assert(dmMesh);
+
+  // Allocate vectors for vertex values
+  scalar_array jacobianVertex(spaceDim*spaceDim);
+  int_array indicesL(spaceDim);
+  int_array indicesN(spaceDim);
+  int_array indicesP(spaceDim);
+  int_array indicesRel(spaceDim);
+  for (int i=0; i < spaceDim; ++i) {
+    indicesRel[i] = i;
+  } // for
+
+  // Get sparse matrix
+  const PetscMat jacobianMatrix = jacobian->matrix();assert(jacobianMatrix);
+
+  _logger->eventEnd(setupEvent);
+#if !defined(DETAILED_EVENT_LOGGING)
+  _logger->eventBegin(computeEvent);
+#endif
+
+  const int numVertices = _cohesiveVertices.size();
+  for (int iVertex=0; iVertex < numVertices; ++iVertex) {
+    const int e_lagrange = _cohesiveVertices[iVertex].lagrange;
+    const int v_fault = _cohesiveVertices[iVertex].fault;
+    const int v_negative = _cohesiveVertices[iVertex].negative;
+    const int v_positive = _cohesiveVertices[iVertex].positive;
+
+    if (e_lagrange < 0) { // Skip clamped edges.
+      continue;
+    } // if
+
+    // Compute contribution only if Lagrange constraint is local.
+    PetscInt gloff = 0;
+    err = PetscSectionGetOffset(solnGlobalSection, e_lagrange, &gloff);PYLITH_CHECK_ERROR(err);
+    if (gloff < 0)
+      continue;
+
+    PetscInt gnoff = 0;
+    err = PetscSectionGetOffset(solnGlobalSection, v_negative, &gnoff);PYLITH_CHECK_ERROR(err);
+    gnoff = gnoff < 0 ? -(gnoff+1) : gnoff;
+
+    PetscInt gpoff = 0;
+    err = PetscSectionGetOffset(solnGlobalSection, v_positive, &gpoff);PYLITH_CHECK_ERROR(err);
+    gpoff = gpoff < 0 ? -(gpoff+1) : gpoff;
+
+#if defined(DETAILED_EVENT_LOGGING)
+    _logger->eventBegin(restrictEvent);
+#endif
+
+    // Get area associated with fault vertex.
+    const PetscInt aoff = areaVisitor.sectionOffset(v_fault);
+    assert(1 == areaVisitor.sectionDof(v_fault));
+
+    // Set global order indices
+    indicesL = indicesRel + gloff;
+    indicesN = indicesRel + gnoff;
+    indicesP = indicesRel + gpoff;
+    PetscInt cdof;
+    err = PetscSectionGetConstraintDof(solnSection, v_negative, &cdof);PYLITH_CHECK_ERROR(err);assert(0 == cdof);
+    err = PetscSectionGetConstraintDof(solnSection, v_positive, &cdof);PYLITH_CHECK_ERROR(err);assert(0 == cdof);
+
+#if defined(DETAILED_EVENT_LOGGING)
+    _logger->eventEnd(restrictEvent);
+    _logger->eventBegin(updateEvent);
+#endif
+
+    // Set diagonal entries of Jacobian at positive vertex to area
+    // associated with vertex.
+    for (int iDim=0; iDim < spaceDim; ++iDim)
+      jacobianVertex[iDim*spaceDim+iDim] = areaArray[aoff];
+
+    // Values at positive vertex, entry L,P in Jacobian
+    err = MatSetValues(jacobianMatrix, 
+		       indicesL.size(), &indicesL[0], 
+		       indicesP.size(), &indicesP[0], 
+		       &jacobianVertex[0], ADD_VALUES);PYLITH_CHECK_ERROR(err);
+
+    // Values at positive vertex, entry P,L in Jacobian
+    err = MatSetValues(jacobianMatrix, 
+		       indicesP.size(), &indicesP[0], 
+		       indicesL.size(), &indicesL[0], 
+		       &jacobianVertex[0], ADD_VALUES);PYLITH_CHECK_ERROR(err);
+    
+    // Values at negative vertex, entry L,N in Jacobian
+    jacobianVertex *= -1.0;
+    err = MatSetValues(jacobianMatrix,
+		       indicesL.size(), &indicesL[0],
+		       indicesN.size(), &indicesN[0],
+		       &jacobianVertex[0], ADD_VALUES);PYLITH_CHECK_ERROR(err);
+
+    // Values at negative vertex, entry N,L in Jacobian
+    err = MatSetValues(jacobianMatrix,
+		       indicesN.size(), &indicesN[0],
+		       indicesL.size(), &indicesL[0],
+		       &jacobianVertex[0], ADD_VALUES);PYLITH_CHECK_ERROR(err);
+
+    // Values at Lagrange vertex, entry L,L in Jacobian
+    // We must have entries on the diagonal.
+    jacobianVertex = 0.0;
+    err = MatSetValues(jacobianMatrix,
+		       indicesL.size(), &indicesL[0],
+		       indicesL.size(), &indicesL[0],
+		       &jacobianVertex[0], ADD_VALUES);PYLITH_CHECK_ERROR(err);
+
+#if defined(DETAILED_EVENT_LOGGING)
+    _logger->eventEnd(updateEvent);
+#endif
+
+  } // for
+  PetscLogFlops(numVertices*spaceDim*2);
+
+#if !defined(DETAILED_EVENT_LOGGING)
+  _logger->eventEnd(computeEvent);
+#endif
+
+  _needNewJacobian = false;
+
+  PYLITH_METHOD_END;
+} // integrateJacobian
+
+
 // ----------------------------------------------------------------------
 // Update state variables as needed.
 void

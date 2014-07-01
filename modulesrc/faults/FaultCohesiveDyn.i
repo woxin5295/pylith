@@ -45,7 +45,7 @@ namespace pylith {
        *
        * @param tract Spatial and temporal variation of tractions.
        */
-      void tractionPerturbation(TractPerturbation* tract);
+      void tractionPerturbation(TractionPerturbation* tract);
   
       /** Set the friction (constitutive) model.
        *
@@ -92,8 +92,20 @@ namespace pylith {
        */
       virtual
       void integrateResidual(const pylith::topology::Field& residual,
-				      const PylithScalar t,
-				      pylith::topology::SolutionFields* const fields);
+			     const PylithScalar t,
+			     pylith::topology::SolutionFields* const fields);
+
+      /** Integrate contributions to Jacobian matrix (A) associated with
+       * operator that require assembly across processors.
+       *
+       * @param jacobian Sparse matrix
+       * @param t Current time
+       * @param fields Solution fields
+       */
+      virtual
+      void integrateJacobian(pylith::topology::Jacobian* jacobian,
+			     const PylithScalar t,
+			     pylith::topology::SolutionFields* const fields);
 
       /** Update state variables as needed.
        *
@@ -104,16 +116,6 @@ namespace pylith {
       void updateStateVars(const PylithScalar t,
 			   pylith::topology::SolutionFields* const fields);
       
-      /** Constrain solution space based on friction.
-       *
-       * @param fields Solution fields.
-       * @param t Current time.
-       * @param jacobian Sparse matrix for system Jacobian.
-       */
-      void constrainSolnSpace(pylith::topology::SolutionFields* const fields,
-			      const PylithScalar t,
-			      const pylith::topology::Jacobian& jacobian);
-
       /** Adjust solution from solver with lumped Jacobian to match Lagrange
        *  multiplier constraints.
        *

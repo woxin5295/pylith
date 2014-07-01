@@ -41,7 +41,7 @@ nobase_pkgpyexec_PYTHON = \
 	faults/SlipTimeFn.py \
 	faults/StepSlipFn.py \
 	faults/TimeHistorySlipFn.py \
-	faults/TractPerturbation.py \
+	faults/TractionPerturbation.py \
 	faults/Fault.py \
 	faults/FaultCohesive.py \
 	faults/FaultCohesiveKin.py \
