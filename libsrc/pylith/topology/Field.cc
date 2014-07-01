@@ -786,8 +786,7 @@ pylith::topology::Field::dimensionalize(void) const
   if (!const_cast<Field*>(this)->_metadata["default"].dimsOkay) {
     std::ostringstream msg;
     msg << "Cannot dimensionalize field '" << const_cast<Field*>(this)->_metadata["default"].label
-	<< "' because the flag "
-	<< "has been set to keep field nondimensional.";
+	<< "' because the flag has been set to keep field nondimensional.";
     throw std::runtime_error(msg.str());
   } // if
 
@@ -1186,7 +1185,7 @@ pylith::topology::Field::_getScatter(const char* context,
 
   if (isNewScatter && !createOk) {
     std::ostringstream msg;
-    msg << "Scatter for context '" << context << "' does not exist.";
+    msg << "Scatter for context '" << context << "' does not exist for field '" << label() << "'.";
     throw std::runtime_error(msg.str());
   } // if
   
@@ -1213,7 +1212,7 @@ pylith::topology::Field::_getScatter(const char* context) const
     _scatters.find(context);
   if (s_iter == _scatters.end()) {
     std::ostringstream msg;
-    msg << "Scatter for context '" << context << "' does not exist.";
+    msg << "Scatter for context '" << context << "' does not exist for field '" << label() << "'.";
     throw std::runtime_error(msg.str());
   } // if
   
@@ -1257,10 +1256,14 @@ pylith::topology::Field::subfieldsSetup(void)
   PetscSection section = NULL;
   PetscErrorCode err = DMGetDefaultSection(_dm, &section);PYLITH_CHECK_ERROR(err);assert(section);
   err = PetscSectionSetNumFields(section, _subfieldComps.size());PYLITH_CHECK_ERROR(err);
+  err = DMSetNumFields(_dm, _subfieldComps.size());PYLITH_CHECK_ERROR(err);
   for(std::map<std::string, int>::const_iterator f_iter = _subfieldComps.begin(); f_iter != _subfieldComps.end(); ++f_iter) {
+    PetscObject fobj;
     const PetscInt index = subfieldMetadata(f_iter->first.c_str()).index;
     err = PetscSectionSetFieldName(section, index, f_iter->first.c_str());PYLITH_CHECK_ERROR(err);
     err = PetscSectionSetFieldComponents(section, index, f_iter->second);PYLITH_CHECK_ERROR(err);
+    err = DMGetField(_dm, index, &fobj);PYLITH_CHECK_ERROR(err);assert(section);
+    err = PetscObjectSetName(fobj, f_iter->first.c_str());PYLITH_CHECK_ERROR(err);
   } // for
 
   PYLITH_METHOD_END;
@@ -1295,7 +1298,7 @@ pylith::topology::Field::subfieldSetDof(const char *name,
     std::ostringstream msg;
     msg << "Unknown value for DomainEnum: " << domain << "  in Field" << std::endl;
     throw std::logic_error(msg.str());
-  }
+  } // switch
   PetscSection section = NULL;
   err = DMGetDefaultSection(_dm, &section);PYLITH_CHECK_ERROR(err);assert(section);
   const int iField = _metadata[name].index;

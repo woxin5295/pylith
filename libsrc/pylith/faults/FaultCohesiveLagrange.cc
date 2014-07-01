@@ -1053,8 +1053,8 @@ pylith::faults::FaultCohesiveLagrange::verifyConfiguration(const topology::Mesh&
 
   if (ncells > 0 && eMax < 0) {
     std::ostringstream msg;
-    msg << "No hybrid edges found in mesh with cohesive cells.";
-    throw std::runtime_error(msg.str());
+    msg << "No hybrid edges found in mesh with cohesive cells for fault '" << label() << "'.";
+    throw std::logic_error(msg.str());
   } // if  
 
   for(PetscInt i = 0; i < ncells; ++i) {
@@ -1070,10 +1070,10 @@ pylith::faults::FaultCohesiveLagrange::verifyConfiguration(const topology::Mesh&
     }
     if (numBasis != cellNumEdges) {
       std::ostringstream msg;
-      msg << "Number of dofs in reference cell (" << numBasis
-          << ") is not compatible with number of edges (" << cellNumEdges
-          << ") in cohesive cell " << cells[i] << " for fault '" << label()
-          << "'.";
+      msg << "Quadrature is incompatible with cell for fault '" << label() << "'. "
+	  << "Cell " << cells[i] << " has " << cellNumEdges
+	  << " edges but quadrature reference cell has "
+	  << numBasis << " edges.";
       throw std::runtime_error(msg.str());
     } // if
     err = DMPlexRestoreTransitiveClosure(dmMesh, cells[i], PETSC_TRUE, &closureSize, &closure);PYLITH_CHECK_ERROR(err);
