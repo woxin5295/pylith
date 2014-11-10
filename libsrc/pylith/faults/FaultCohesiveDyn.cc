@@ -222,9 +222,7 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
   const int indexN = spaceDim - 1;
 
   // Get sections associated with cohesive cells
-  PetscDM residualDM = residual.dmMesh();assert(residualDM);
-  PetscSection residualGlobalSection = NULL;
-  PetscErrorCode err = DMGetDefaultGlobalSection(residualDM, &residualGlobalSection);PYLITH_CHECK_ERROR(err);assert(residualGlobalSection);
+  PetscSection residualGlobalSection = residual.globalSection();assert(residualGlobalSection);
 
   topology::VecVisitorMesh residualVisitor(residual);
   PetscScalar* residualArray = residualVisitor.localArray();
@@ -276,6 +274,7 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
 #endif
 
   // Loop over fault vertices
+  PetscErrorCode err = 0;
   const int numVertices = _cohesiveVertices.size();
   for (int iVertex=0; iVertex < numVertices; ++iVertex) {
     const int e_lagrange = _cohesiveVertices[iVertex].lagrange;
@@ -819,7 +818,7 @@ pylith::faults::FaultCohesiveDyn::adjustSolnLumped(topology::SolutionFields* con
   scalar_array dispIncrVertexP(spaceDim);
   scalar_array lagrangeTIncrVertex(spaceDim);
   topology::VecVisitorMesh dispTIncrVisitor(fields->get("dispIncr(t->t+dt)"));
-  PetscScalar* dispTIncrArray = dispTIncrVisitor.localArray();
+  const PetscScalar* dispTIncrArray = dispTIncrVisitor.localArray();
 
   topology::VecVisitorMesh dispTIncrAdjVisitor(fields->get("dispIncr adjust"));
   PetscScalar* dispTIncrAdjArray = dispTIncrAdjVisitor.localArray();
