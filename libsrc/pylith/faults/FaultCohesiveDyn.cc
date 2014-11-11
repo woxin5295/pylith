@@ -198,11 +198,10 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
   // Locked (l_p > 0)
   // Sliding (l_p = 0)
   //
-  // DOF P: \int_{S_f^+} \tensor{N}_m^T \cdot \tensor{N}_p \cdot \vec{T_c}_p dS
-  // DOF N: -\int_{S_f^+} \tensor{N}_m^T \cdot \tensor{N}_p \cdot \vec{T_c}_p dS
-  // DOF L: \int_S_f \tensor{R} \cdot \tensor{N}_p^T \cdot \vec{l}_p^{fault} \cdot 
-  //                 \tensor{R} \cdot (-\tensor{N}_{n^+} \cdot \vec{u}_{n^+}
-  //                                   +\tensor{N}_{n^-} \cdot \vec{u}_{n^-}) dS
+  // DOF P: \int_{S_f^+} \tensor{N}_p^T \cdot \tensor{N}_p \cdot \vec{T_c}_p dS
+  // DOF N: -\int_{S_f^+} \tensor{N}_p^T \cdot \tensor{N}_p \cdot \vec{T_c}_p dS
+  // DOF L: \int_S_f \tensor{N}_p^T \cdot \vec{l}_p^{fault} \cdot 
+  //                 (-\tensor{N}_{n^+} \cdot \vec{u}_{n^+} + \tensor{N}_{n^-} \cdot \vec{u}_{n^-}) dS
 
 
   const int setupEvent = _logger->eventId("FaIR setup");
@@ -311,15 +310,15 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     const PetscInt ooff = orientationVisitor.sectionOffset(v_fault);
     assert(spaceDim*spaceDim == orientationVisitor.sectionDof(v_fault));
 
-    // Get area associated with fault vertex.
+    // Area associated with fault vertex.
     const PetscInt aoff = areaVisitor.sectionOffset(v_fault);
     assert(1 == areaVisitor.sectionDof(v_fault));
 
-    // Get area associated with fault vertex.
+    // Contract traction associated with fault vertex.
     const PetscInt coff = tractionContactVisitor.sectionOffset(v_fault);
     assert(spaceDim == tractionContactVisitor.sectionDof(v_fault));
 
-    // Get disp(t) at conventional vertices and Lagrange vertex.
+    // Disp(t) at conventional vertices and Lagrange vertex.
     const PetscInt dtnoff = dispTVisitor.sectionOffset(v_negative);
     assert(spaceDim == dispTVisitor.sectionDof(v_negative));
 
@@ -329,7 +328,7 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     const PetscInt dtloff = dispTVisitor.sectionOffset(e_lagrange);
     assert(spaceDim == dispTVisitor.sectionDof(e_lagrange));
 
-    // Get dispIncr(t->t+dt) at conventional vertices and Lagrange vertex.
+    // DispIncr(t->t+dt) at conventional vertices and Lagrange vertex.
     const PetscInt dinoff = dispTIncrVisitor.sectionOffset(v_negative);
     assert(spaceDim == dispTIncrVisitor.sectionDof(v_negative));
 
@@ -339,6 +338,7 @@ pylith::faults::FaultCohesiveDyn::integrateResidual(const topology::Field& resid
     const PetscInt diloff = dispTIncrVisitor.sectionOffset(e_lagrange);
     assert(spaceDim == dispTIncrVisitor.sectionDof(e_lagrange));
 
+    // Residual at conventional vertices and Lagrange vertex.
     const PetscInt rnoff = residualVisitor.sectionOffset(v_negative);
     assert(spaceDim == residualVisitor.sectionDof(v_negative));
 
