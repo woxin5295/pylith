@@ -9,7 +9,7 @@
 // This code was developed as part of the Computational Infrastructure
 // for Geodynamics (http://geodynamics.org).
 //
-// Copyright (c) 2010-2014 University of California, Davis
+// Copyright (c) 2010-2015 University of California, Davis
 //
 // See COPYING for license information.
 //
@@ -1050,7 +1050,7 @@ pylith::topology::Field::createScatterWithBC(const Mesh& mesh,
   } // if
 
   err = DMDestroy(&sinfo.dm);PYLITH_CHECK_ERROR(err);
-  err = DMClone(_dm, &sinfo.dm);PYLITH_CHECK_ERROR(err);
+  err = DMClone(dm, &sinfo.dm);PYLITH_CHECK_ERROR(err);
   err = PetscSectionClone(section, &newSection);PYLITH_CHECK_ERROR(err);
   err = DMSetDefaultSection(sinfo.dm, newSection);PYLITH_CHECK_ERROR(err);
   err = PetscSectionDestroy(&newSection);PYLITH_CHECK_ERROR(err);

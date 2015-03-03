@@ -9,7 +9,7 @@
 // This code was developed as part of the Computational Infrastructure
 // for Geodynamics (http://geodynamics.org).
 //
-// Copyright (c) 2010-2014 University of California, Davis
+// Copyright (c) 2010-2015 University of California, Davis
 //
 // See COPYING for license information.
 //
@@ -445,8 +445,7 @@ pylith::meshio::DataWriterHDF5Ext::writeVertexField(const PylithScalar t,
 	const char* sattr = topology::FieldBase::vectorFieldString(field.vectorFieldType());
         _h5->writeAttribute(fullName.c_str(), "vector_field_type", sattr);
       } // if
-    } else {
-      if (!commRank) {
+    } else if (!commRank) {
         // Update number of time steps in external dataset info in HDF5 file.
         const int totalNumTimeSteps = DataWriter::_numTimeSteps;
         assert(totalNumTimeSteps > 0);
@@ -457,7 +456,6 @@ pylith::meshio::DataWriterHDF5Ext::writeVertexField(const PylithScalar t,
         dims[1] = datasetInfo.numPoints;
         dims[2] = datasetInfo.fiberDim;
         _h5->extendDatasetRawExternal("/vertex_fields", field.label(), dims, ndims);
-      } // if
     } // if/else
 
   } catch (const std::exception& err) {
@@ -604,7 +602,7 @@ pylith::meshio::DataWriterHDF5Ext::writeCellField(const PylithScalar t,
         _h5->writeAttribute(fullName.c_str(), "vector_field_type", sattr);
       } // if
 
-    } else {
+    } else if (!commRank) {
       // Update number of time steps in external dataset info in HDF5 file.
       const int totalNumTimeSteps = DataWriter::_numTimeSteps;assert(totalNumTimeSteps > 0);
 	
@@ -635,14 +633,23 @@ pylith::meshio::DataWriterHDF5Ext::writeCellField(const PylithScalar t,
 // Write dataset with names of points to file.
 void
 pylith::meshio::DataWriterHDF5Ext::writePointNames(const char* const* names,
-						   const int numNames)
+						   const int numNames,
+						   const topology::Mesh& mesh)
 { // writePointNames
   PYLITH_METHOD_BEGIN;
 
   assert(_h5);
 
   try {
-    _h5->writeDataset("/", "stations", names, numNames);
+    PetscDM dmMesh = mesh.dmMesh();assert(dmMesh);
+    MPI_Comm comm;
+    PetscMPIInt commRank;
+    PetscErrorCode err = PetscObjectGetComm((PetscObject) dmMesh, &comm);PYLITH_CHECK_ERROR(err);
+    err = MPI_Comm_rank(comm, &commRank);PYLITH_CHECK_ERROR(err);
+
+    if (!commRank) {
+      _h5->writeDataset("/", "stations", names, numNames);
+    } // if
   } catch (const std::exception& err) {
     std::ostringstream msg;
     msg << "Error while writing stations to HDF5 file '" << _hdf5Filename() << "'.\n" << err.what();
@@ -693,8 +700,7 @@ pylith::meshio::DataWriterHDF5Ext::_datasetFilename(const char* field) const
 // ----------------------------------------------------------------------
 // Write time stamp to file.
 void
-pylith::meshio::DataWriterHDF5Ext::_writeTimeStamp(
-						  const PylithScalar t)
+pylith::meshio::DataWriterHDF5Ext::_writeTimeStamp(const PylithScalar t)
 { // _writeTimeStamp
   PYLITH_METHOD_BEGIN;
 

@@ -9,7 +9,7 @@
 // This code was developed as part of the Computational Infrastructure
 // for Geodynamics (http://geodynamics.org).
 //
-// Copyright (c) 2010-2014 University of California, Davis
+// Copyright (c) 2010-2015 University of California, Davis
 //
 // See COPYING for license information.
 //
@@ -64,8 +64,8 @@ pylith::meshio::DataWriterHDF5::deallocate(void)
   DataWriter::deallocate();
 
   PetscErrorCode err = 0;
-  err = PetscViewerDestroy(&_viewer); PYLITH_CHECK_ERROR(err);
-  err = VecDestroy(&_tstamp); PYLITH_CHECK_ERROR(err);
+  err = PetscViewerDestroy(&_viewer); PYLITH_CHECK_ERROR(err);assert(!_viewer);
+  err = VecDestroy(&_tstamp); PYLITH_CHECK_ERROR(err);assert(!_tstamp);
 
   PYLITH_METHOD_END;
 } // deallocate
@@ -252,7 +252,7 @@ pylith::meshio::DataWriterHDF5::close(void)
   PYLITH_METHOD_BEGIN;
 
   PetscErrorCode err = 0;
-  err = PetscViewerDestroy(&_viewer); PYLITH_CHECK_ERROR(err);
+  err = PetscViewerDestroy(&_viewer); PYLITH_CHECK_ERROR(err);assert(!_viewer);
   err = VecDestroy(&_tstamp); PYLITH_CHECK_ERROR(err);assert(!_tstamp);
 
   _timesteps.clear();
@@ -409,7 +409,8 @@ pylith::meshio::DataWriterHDF5::writeCellField(const PylithScalar t,
 // Write dataset with names of points to file.
 void
 pylith::meshio::DataWriterHDF5::writePointNames(const char* const* names,
-						const int numNames)
+						const int numNames,
+						const topology::Mesh& mesh)
 { // writePointNames
   PYLITH_METHOD_BEGIN;
 
@@ -462,7 +463,7 @@ pylith::meshio::DataWriterHDF5::_writeTimeStamp(const PylithScalar t,
   assert(_tstamp);
   PetscErrorCode err = 0;
 
-  if (0 == commRank) {
+  if (!commRank) {
     const PylithScalar tDim = t * DataWriter::_timeScale;
     err = VecSetValue(_tstamp, 0, tDim, INSERT_VALUES); PYLITH_CHECK_ERROR(err);
   } // if
