@@ -243,7 +243,7 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualStick(void)
   residual.view("RESIDUAL"); // DEBUGGING
   { // Check residual values
     PetscInt pStart=0, pEnd=0;
-    PetscErrorCode err = PetscSectionGetChart(residual.petscSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
+    PetscErrorCode err = PetscSectionGetChart(residual.localSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
     topology::VecVisitorMesh residualVisitor(residual);
     const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
@@ -299,7 +299,7 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualSlip(void)
   residual.view("RESIDUAL"); // DEBUGGING
   { // Check residual values
     PetscInt pStart=0, pEnd=0;
-    PetscErrorCode err = PetscSectionGetChart(residual.petscSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
+    PetscErrorCode err = PetscSectionGetChart(residual.localSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
     topology::VecVisitorMesh residualVisitor(residual);
     const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 
@@ -361,7 +361,7 @@ pylith::faults::TestFaultCohesiveDyn::testIntegrateResidualOpen(void)
   residual.view("RESIDUAL"); // DEBUGGING
   { // Check residual values
     PetscInt pStart=0, pEnd=0;
-    PetscErrorCode err = PetscSectionGetChart(residual.petscSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
+    PetscErrorCode err = PetscSectionGetChart(residual.localSection(), &pStart, &pEnd);CPPUNIT_ASSERT(!err);
     topology::VecVisitorMesh residualVisitor(residual);
     const PetscScalar* residualArray = residualVisitor.localArray();CPPUNIT_ASSERT(residualArray);
 

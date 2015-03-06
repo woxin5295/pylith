@@ -497,7 +497,7 @@ pylith::faults::FaultCohesiveDyn::integrateJacobian(topology::Jacobian* jacobian
   const PetscScalar* areaArray = areaVisitor.localArray();
   
   PetscDM solnDM = fields->solution().dmMesh();assert(solnDM);
-  PetscSection solnSection = fields->solution().petscSection();assert(solnSection);
+  PetscSection solnSection = fields->solution().localSection();assert(solnSection);
   PetscSection solnGlobalSection = NULL;
   PetscErrorCode err = DMGetDefaultGlobalSection(solnDM, &solnGlobalSection);PYLITH_CHECK_ERROR(err);assert(solnGlobalSection);
 
@@ -818,7 +818,7 @@ pylith::faults::FaultCohesiveDyn::adjustSolnLumped(topology::SolutionFields* con
   scalar_array dispIncrVertexP(spaceDim);
   scalar_array lagrangeTIncrVertex(spaceDim);
   topology::VecVisitorMesh dispTIncrVisitor(fields->get("dispIncr(t->t+dt)"));
-  const PetscScalar* dispTIncrArray = dispTIncrVisitor.localArray();
+  PetscScalar* dispTIncrArray = dispTIncrVisitor.localArray();
 
   topology::VecVisitorMesh dispTIncrAdjVisitor(fields->get("dispIncr adjust"));
   PetscScalar* dispTIncrAdjArray = dispTIncrAdjVisitor.localArray();
