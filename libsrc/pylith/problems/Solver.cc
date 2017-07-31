@@ -281,6 +281,42 @@ pylith::problems::Solver::_createNullSpace(const topology::SolutionFields& field
     PYLITH_METHOD_END;
 } // _createNullSpace
 
+
+// ----------------------------------------------------------------------
+// Create null space.
+void
+pylith::problems::Solver::_createNullSpaceBodies(const topology::SolutionFields& fields,
+						 const PetscInt numBodies,
+						 const PetscInt numMaterialsInBodies[],
+						 const PetscInt bodyIds[],
+						 
+    )
+{ // _createNullSpaceBodies
+    PYLITH_METHOD_BEGIN;
+
+    PetscErrorCode err;
+
+    PetscDMLabel label = NULL;
+    MatNullSpace nullSpace = NULL;
+    PetscDM dmMesh = fields.solution().dmMesh(); assert(dmMesh);
+    err = DMGetLabel(dmMesh, "material-id", &label); PYLITH_CHECK_ERR(err);
+    
+    err = DMPlexCreateRigidBodies(dmMesh, numBodies, dmLabel, numMaterialsInBodies, bodyIds, &nullSpace);PYLITH_CHECK_ERROR(err);
+
+    PetscObject field = NULL;
+    PetscInt numFields;
+    err = DMGetNumFields(dmMesh, &numFields); PYLITH_CHECK_ERROR(err);
+    if (!numFields) {
+        err = DMSetNumFields(dmMesh, 1); PYLITH_CHECK_ERROR(err);
+    } // if
+    err = DMGetField(dmMesh, 0, &field); PYLITH_CHECK_ERROR(err);
+    err = PetscObjectCompose(field, "nearnullspace", (PetscObject) nullSpace); PYLITH_CHECK_ERROR(err);
+    err = MatNullSpaceDestroy(&nullSpace); PYLITH_CHECK_ERROR(err);
+
+    PYLITH_METHOD_END;
+} // _createNullSpaceBodies
+
+
 // ----------------------------------------------------------------------
 // Setup preconditioner for preconditioning with split fields.
 void

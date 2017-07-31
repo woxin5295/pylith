@@ -63,16 +63,18 @@ public :
   virtual
   void deallocate(void);
   
-  /** Set flag signaling to skip null space creation.
+  /** Create null space associated with rigid body motion for multiple
+   * bodies..
    *
-   * This flag can be used to skip creating the null space in very
-   * small problems in which the number of DOF is less than the size
-   * of the null space, and the problem does not contain a null space.
-   *
-   * @param[in] value True to skip creating null space.
+   * @param fields Solution fields.
+   * @param numBodies Number of bodies in domain.
+   * @param numMaterialsInBodies Array with number of materials in each body.
+   * @param bodiesMaterialIds Array of material ids for each body.
    */
-  void skipNullSpaceCreation(const bool value);
-
+    void createNullSpaceBodies(const topology::SolutionFields& fields,
+			       const PetscInt numBodies,
+			       const PetscInt numMaterialsInBodies[],
+			       const PetscInt bodiesMaterialIds[]);
 
   /** Initialize solver.
    *
@@ -87,12 +89,6 @@ public :
 
 // PROTECTED METHODS ////////////////////////////////////////////////////
 protected :
-
-  /** Create rigid body null space.
-   *
-   * @param fields Solution fields.
-   */
-  void _createNullSpace(const topology::SolutionFields& fields);
 
   /** Setup preconditioner for preconditioning using split fields.
    *
@@ -121,7 +117,6 @@ protected :
   PetscMat _jacobianPC; ///< Global preconditioning matrix.
   PetscMat _jacobianPCFault; ///< Preconditioning matrix for Lagrange constraints.
   FaultPreconCtx _ctx; ///< Context for preconditioning matrix for Lagrange constraints.
-  bool _skipNullSpaceCreation; ///< Skip creating the null space (useful for very small problems with no null space).
 
 // NOT IMPLEMENTED //////////////////////////////////////////////////////
 private :

@@ -54,14 +54,14 @@ class SolverLinear(Solver, ModuleSolverLinear):
     Constructor.
     """
     Solver.__init__(self, name)
-    ModuleSolverLinear.__init__(self)
     return
 
 
-  def initialize(self, fields, jacobian, formulation):
+  def initialize(self, materials, fields, jacobian, formulation):
     """
     Initialize linear solver.
     """
+    Solver.initialize(materials)
     ModuleSolverLinear.initialize(self, fields, jacobian, formulation)
     return
 
@@ -73,11 +73,17 @@ class SolverLinear(Solver, ModuleSolverLinear):
     Set members based using inventory.
     """
     Solver._configure(self)
-
-    ModuleSolverLinear.skipNullSpaceCreation(self, not self.createNullSpace)
     return
 
 
+  def _createModuleObj(self):
+    """
+    Create handle to C++ SolverLinear.
+    """
+    ModuleSolverLinear.__init__(self)
+    return
+    
+  
 # FACTORIES ////////////////////////////////////////////////////////////
 
 def solver():

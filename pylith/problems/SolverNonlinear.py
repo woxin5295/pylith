@@ -55,7 +55,6 @@ class SolverNonlinear(Solver, ModuleSolverNonlinear):
     Constructor.
     """
     Solver.__init__(self, name)
-    ModuleSolverNonlinear.__init__(self)
     return
 
 
@@ -66,11 +65,17 @@ class SolverNonlinear(Solver, ModuleSolverNonlinear):
     Set members based using inventory.
     """
     Solver._configure(self)
-
-    ModuleSolverNonlinear.skipNullSpaceCreation(self, not self.createNullSpace)
     return
 
 
+  def _createModuleObj(self):
+    """
+    Create handle to C++ SolverNonlinear.
+    """
+    ModuleSolverNonlinear.__init__(self)
+    return
+    
+  
 # FACTORIES ////////////////////////////////////////////////////////////
 
 def solver():
