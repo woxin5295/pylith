@@ -35,6 +35,7 @@ namespace pylith {
       Implicit(void);
       
       /// Destructor
+      virtual
       ~Implicit(void);
 
       /// Compute rate fields (velocity and/or acceleration) at time t.
