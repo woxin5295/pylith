@@ -45,6 +45,7 @@ public :
   Explicit(void);
 
   /// Destructor
+  virtual
   ~Explicit(void);
 
   /// Compute rate fields (velocity and/or acceleration) at time t.
