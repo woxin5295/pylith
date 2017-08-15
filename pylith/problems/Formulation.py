@@ -72,6 +72,9 @@ class Formulation(PetscComponent, ModuleFormulation):
     ## @li \b solver Algebraic solver.
     ## @li \b output Output manager associated with solution.
     ## @li \b jacobian_viewer Writer for Jacobian sparse matrix.
+    ## @li \b null_space Create null space for solver. Default is rigid body
+    ## motion for a single body. Domains with through-going faults have
+    ## multiple bodies and should use NullSpaceMultiBody.
 
     import pyre.inventory
 
@@ -79,42 +82,36 @@ class Formulation(PetscComponent, ModuleFormulation):
     matrixType.meta['tip'] = "Type of PETSc sparse matrix."
 
     useSplitFields = pyre.inventory.bool("split_fields", default=False)
-    useSplitFields.meta['tip'] = "Split solution fields into displacements "\
-        "and Lagrange multipliers for separate preconditioning."
+    useSplitFields.meta['tip'] = "Split solution fields into displacements and Lagrange multipliers for separate preconditioning."
 
-    useCustomConstraintPC = pyre.inventory.bool("use_custom_constraint_pc",
-                                                default=False)
-    useCustomConstraintPC.meta['tip'] = "Use custom preconditioner for " \
-                                        "Lagrange constraints."
+    useCustomConstraintPC = pyre.inventory.bool("use_custom_constraint_pc", default=False)
+    useCustomConstraintPC.meta['tip'] = "Use custom preconditioner for Lagrange constraints."
 
     viewJacobian = pyre.inventory.bool("view_jacobian", default=False)
     viewJacobian.meta['tip'] = "Write Jacobian matrix to binary file."
     
     from TimeStepUniform import TimeStepUniform
-    timeStep = pyre.inventory.facility("time_step", family="time_step",
-                                       factory=TimeStepUniform)
+    timeStep = pyre.inventory.facility("time_step", family="time_step", factory=TimeStepUniform)
     timeStep.meta['tip'] = "Time step size manager."
 
     from SolverLinear import SolverLinear
-    solver = pyre.inventory.facility("solver", family="solver",
-                                     factory=SolverLinear)
+    solver = pyre.inventory.facility("solver", family="solver", factory=SolverLinear)
     solver.meta['tip'] = "Algebraic solver."
 
     from pylith.meshio.SingleOutput import SingleOutput
-    output = pyre.inventory.facilityArray("output",
-                                          itemFactory=outputFactory,
-                                          factory=SingleOutput)
+    output = pyre.inventory.facilityArray("output", itemFactory=outputFactory, factory=SingleOutput)
     output.meta['tip'] = "Output managers associated with solution."
 
     from pylith.topology.JacobianViewer import JacobianViewer
-    jacobianViewer = pyre.inventory.facility("jacobian_viewer", 
-                                             family="jacobian_viewer",
-                                             factory=JacobianViewer)
+    jacobianViewer = pyre.inventory.facility("jacobian_viewer", family="jacobian_viewer", factory=JacobianViewer)
     jacobianViewer.meta['tip'] = "Writer for Jacobian sparse matrix."
 
+    from NullSpaceSingleBody import NullSpaceSingleBody
+    nullSpace = pyre.inventory.facility("null_space", family="null_space", factory=NullSpaceSingleBody)
+    nullSpace.meta['tip'] = "Create null space for solver. Default is rigid body motion for a single body. Domains with through-going faults have multiple bodies and should use NullSpaceMultiBody."
+    
     from pylith.perf.MemoryLogger import MemoryLogger
-    perfLogger = pyre.inventory.facility("perf_logger", family="perf_logger",
-                                         factory=MemoryLogger)
+    perfLogger = pyre.inventory.facility("perf_logger", family="perf_logger", factory=MemoryLogger)
     perfLogger.meta['tip'] = "Performance and memory logging."
 
 
@@ -133,8 +130,7 @@ class Formulation(PetscComponent, ModuleFormulation):
     return
 
 
-  def preinitialize(self, mesh, materials, boundaryConditions,
-                    interfaceConditions, gravityField):
+  def preinitialize(self, mesh, materials, boundaryConditions, interfaceConditions, gravityField):
     """
     Create integrator for each element family.
     """
@@ -146,6 +142,7 @@ class Formulation(PetscComponent, ModuleFormulation):
     comm = mpi_comm_world()
 
     self.timeStep.preinitialize()
+    self.nullSpace.preinitialize(materials)
 
     import weakref
     self.mesh = weakref.ref(mesh)
@@ -153,7 +150,6 @@ class Formulation(PetscComponent, ModuleFormulation):
     self.constraints = []
     self.gravityField = gravityField
 
-    self.solver.preinitialize()
     self._setupMaterials(materials)
     self._setupBC(boundaryConditions)
     self._setupInterfaces(interfaceConditions)
@@ -175,6 +171,7 @@ class Formulation(PetscComponent, ModuleFormulation):
     self._eventLogger.eventBegin(logEvent)
 
     self.timeStep.verifyConfiguration()
+    self.nullSpace.verifyConfiguration()
 
     for integrator in self.integrators:
       integrator.verifyConfiguration()
@@ -301,6 +298,7 @@ class Formulation(PetscComponent, ModuleFormulation):
     self.viewJacobian = self.inventory.viewJacobian
     self.jacobianViewer = self.inventory.jacobianViewer
     self.perfLogger = self.inventory.perfLogger
+    self.nullSpace = self.inventory.nullSpace
 
     import journal
     self._debug = journal.debug(self.name)
@@ -338,8 +336,6 @@ class Formulation(PetscComponent, ModuleFormulation):
               (self.matrixType, matrixMap[self.matrixType])
         self.matrixType = matrixMap[self.matrixType]
     self.blockMatrixOkay = True
-    if self.matrixType == "unknown" and self.solver.useCUDA:
-      self.matrixType = "aijcusp"
     for constraint in self.constraints:
       numDimConstrained = constraint.numDimConstrained()
       if numDimConstrained > 0 and self.mesh().dimension() != numDimConstrained:

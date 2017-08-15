@@ -25,11 +25,10 @@
 ##
 ## Factory: null_space
 
-from pylith.utils.PetscComponent import PetscComponent
-from problems import NullSpace as ModuleNullSpace
+from pyre.components.Component import Component
 
 # NullSpace class
-class NullSpace(PetscComponent, ModuleNullSpace):
+class NullSpace(Component):
   """
   Python object for creating the null space for the solver.
 
@@ -42,18 +41,25 @@ class NullSpace(PetscComponent, ModuleNullSpace):
     """
     Constructor.
     """
-    PetscComponent.__init__(self, name, facility="null_space")
-    self._createModuleObject()
+    Component.__init__(self, name, facility="null_space")
     return
 
 
-  def verifyConfiguration(self, materials):
+  def preinitialize(self, materials):
+    """
+    Do minimum initialization.
+    """
+    self.materials = materials
+    return
+
+  
+  def verifyConfiguration(self):
     """
     Verify configuration
     """
     return
 
-  def initialize(self, materials):
+  def initialize(self, fields, formulation):
     """
     Initialize object.
     """
@@ -65,18 +71,10 @@ class NullSpace(PetscComponent, ModuleNullSpace):
     """
     Set members based using inventory.
     """
-    PetscComponent._configure(self)
+    Component._configure(self)
     return
 
 
-  def _createModuleObj(self):
-    """
-    Create handle to C++ NullSpace.
-    """
-    ModuleNullSpace.__init__(self)
-    return
-    
-  
 # FACTORIES ////////////////////////////////////////////////////////////
 
 def null_space():

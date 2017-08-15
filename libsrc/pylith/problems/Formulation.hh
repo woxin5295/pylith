@@ -50,6 +50,7 @@ public :
   Formulation(void);
 
   /// Destructor
+  virtual
   ~Formulation(void);
 
   /// Deallocate PETSc and local data structures.
@@ -130,6 +131,21 @@ public :
 		      topology::SolutionFields* fields,
 		      const PylithScalar t,
 		      const PylithScalar dt);
+
+  /** Create null space associated with rigid body motion for multiple
+   * bodies.
+   *
+   * @param fields Solution fields.
+   * @param numMaterialsInBodies Array with number of materials in each body.
+   * @param numBodies Number of bodies in domain (size of numMaterialsInBodies array).
+   * @param bodiesMaterialIds Array of material ids for each body.
+   * @param numMaterials Number of materials (size of bodiesMoterialIds array).
+   */
+  void createNullSpaceBodies(const pylith::topology::SolutionFields& fields,
+			     const PetscInt numMaterialsInBodies[],
+			     const PetscInt numBodies,
+			     const PetscInt bodiesMaterialIds[],
+			     const PetscInt numMaterials);
 
   /** Reform system residual.
    *

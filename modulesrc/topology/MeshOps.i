@@ -51,8 +51,7 @@
   MeshOps_checkMaterialIds(const pylith::topology::Mesh& mesh,
 			   int* const materialIds,
 			   const int numMaterials) {
-    pylith::topology::MeshOps::checkMaterialIds(mesh, 
-						materialIds, numMaterials);
+    pylith::topology::MeshOps::checkMaterialIds(mesh, materialIds, numMaterials);
   } // checkMaterialIds
 %}
 %clear(int* const materialIds, const int numMaterials);

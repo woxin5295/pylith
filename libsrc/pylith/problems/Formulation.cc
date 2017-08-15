@@ -188,6 +188,40 @@ pylith::problems::Formulation::updateSettings(topology::Field* jacobian,
 } // updateSettings
 
 // ----------------------------------------------------------------------
+// Create null space.
+void
+pylith::problems::Formulation::createNullSpaceBodies(const pylith::topology::SolutionFields& fields,
+						     const PetscInt numMaterialsInBodies[],
+						     const PetscInt numBodies,
+						     const PetscInt bodiesMaterialIds[],
+						     const PetscInt numMaterials)
+{ // createNullSpaceBodies
+    PYLITH_METHOD_BEGIN;
+
+    PetscErrorCode err;
+
+    PetscDMLabel label = NULL;
+    MatNullSpace nullSpace = NULL;
+    PetscDM dmMesh = fields.solution().dmMesh(); assert(dmMesh);
+    err = DMGetLabel(dmMesh, "material-id", &label); PYLITH_CHECK_ERROR(err);
+    
+    err = DMPlexCreateRigidBodies(dmMesh, numBodies, label, numMaterialsInBodies, bodiesMaterialIds, &nullSpace);PYLITH_CHECK_ERROR(err);
+
+    PetscObject field = NULL;
+    PetscInt numFields;
+    err = DMGetNumFields(dmMesh, &numFields); PYLITH_CHECK_ERROR(err);
+    if (!numFields) {
+        err = DMSetNumFields(dmMesh, 1); PYLITH_CHECK_ERROR(err);
+    } // if
+    err = DMGetField(dmMesh, 0, &field); PYLITH_CHECK_ERROR(err);
+    err = PetscObjectCompose(field, "nearnullspace", (PetscObject) nullSpace); PYLITH_CHECK_ERROR(err);
+    err = MatNullSpaceDestroy(&nullSpace); PYLITH_CHECK_ERROR(err);
+
+    PYLITH_METHOD_END;
+} // createNullSpaceBodies
+
+
+// ----------------------------------------------------------------------
 // Reform system residual.
 void
 pylith::problems::Formulation::reformResidual(const PetscVec* tmpResidualVec,

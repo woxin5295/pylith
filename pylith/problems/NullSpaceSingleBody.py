@@ -24,10 +24,9 @@
 ## Factory: null_space
 
 from NullSpace import NullSpace
-from problems import NullSpaceBodies as ModuleNullSpaceBodies
 
 # NullSpaceSingleBody class
-class NullSpaceSingleBody(NullSpace, ModuleNullSpaceBodies):
+class NullSpaceSingleBody(NullSpace):
   """
   Python object for creating the null space for a domain with a single body.
 
@@ -44,44 +43,28 @@ class NullSpaceSingleBody(NullSpace, ModuleNullSpaceBodies):
     return
 
 
-  def initialize(self, materials):
+  def initialize(self, fields, formulation):
     """
-    Initialize object. Setup a single body containing all of the materials.
+    Initialize object.
     """
-    numMaterials = len(materials.components())
-    numMaterialsInBodies = [numMaterials]
+    import numpy
     numBodies = 1
-    bodyIds = []
-    for material in materials.components():
-        bodyIds.append[material.id()]
-    ModuleNullSpaceBodies.bodies(self, bodyIds, numMaterials, numMaterialsInBodies, numBodies)
+    numMaterials = len(self.materials.components())
+    bodiesIds = numpy.zeros((numMaterials,), dtype=numpy.int32)
+    numMaterialsInBodies = numpy.array([numMaterials], dtype=numpy.int32)
+    for imaterial,material in enumerate(self.materials.components()):
+        bodiesIds[imaterial] = material.id()
+
+    formulation.createNullSpaceBodies(fields, numMaterialsInBodies, bodiesIds)
     return
 
-  # PRIVATE METHODS /////////////////////////////////////////////////////
-
-  def _configure(self):
-    """
-    Set members based using inventory.
-    """
-    PetscComponent._configure(self)
-    return
-
-
-  def _createModuleObj(self):
-    """
-    Create handle to C++ NullSpaceSingleBody.
-    """
-    ModuleNullSpaceSingleBody.__init__(self)
-    return
-    
-  
 # FACTORIES ////////////////////////////////////////////////////////////
 
 def null_space():
   """
   Factory associated with NullSpaceSingleBody.
   """
-  return NullSpaceNone()
+  return NullSpaceSingleBody()
 
 
 # End of file 

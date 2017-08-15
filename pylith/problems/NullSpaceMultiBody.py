@@ -25,10 +25,53 @@
 ##
 ## Factory: null_space
 
-from pylith.utils.PetscComponent import PetscComponent
+from NullSpace import NullSpace
+from pyre.components.Component import Component
+
+# ITEM FACTORIES ///////////////////////////////////////////////////////
+
+# RigidBody
+class RigidBody(Component):
+
+  # INVENTORY //////////////////////////////////////////////////////////
+
+  class Inventory(Component.Inventory):
+    """
+    Python object for managing RigidBody facilities and properties.
+    """
+
+    import pyre.inventory
+    materials = pyre.inventory.list("materials", default=[])
+    materials.meta['tip'] = "Array of materials in body."
+
+
+  # PUBLIC METHODS /////////////////////////////////////////////////////
+
+  def __init__(self, name="rigidbody"):
+    """
+    Constructor.
+    """
+    Component.__init__(self, name)
+    return
+
+  def _configure(self):
+    """
+    Set members based using inventory.    
+    """
+    Component._configure(self)
+    self.materials = self.inventory.materials
+    return
+  
+def bodyFactory(name):
+  """
+  Factory for rigid bodies.
+  """
+  from pyre.inventory import facility
+  return facility(name, family="rigid_body", factory=RigidBody)
+
 
 # NullSpaceMultiBody class
-class NullSpaceMultiBody(PetscComponent):
+class NullSpaceMultiBody(NullSpace):
   """
   Python object for creating the null space with multiple bodies.
 
@@ -37,15 +80,15 @@ class NullSpaceMultiBody(PetscComponent):
 
   # INVENTORY //////////////////////////////////////////////////////////
 
-  class Inventory(NullSpaceMultiBody.Inventory):
+  class Inventory(NullSpace.Inventory):
     """
     Python object for managing NullSpaceMultiBody facilities and properties.
     """
 
     import pyre.inventory
-    bodies = self.inventory.list("bodies", default=[])
-    bodies.meta['tip'] = "Array of materials associated with each body."
-    
+    bodies = pyre.inventory.facilityArray("bodies", itemFactory=bodyFactory)
+    bodies.meta['tip'] = "Array of bodies separated by faults."
+
 
   # PUBLIC METHODS /////////////////////////////////////////////////////
 
@@ -53,22 +96,23 @@ class NullSpaceMultiBody(PetscComponent):
     """
     Constructor.
     """
-    PetscComponent.__init__(self, name, facility="null_space")
+    NullSpace.__init__(self, name)
     return
 
 
-  def verifyConfiguration(self, materials):
+  def verifyConfiguration(self):
     """
     Verify configuration
     """
     msg = "Could not find body material(s) in materials."
     missing = False
-    for body in bodies:
-        for name in body:
+    for body in self.bodies.components():
+        for name in body.materials:
             found = False
-            for material in materials.components():
-                found = True
-                break
+            for material in self.materials.facilities():
+                if name == material.name:
+                    found = True
+                    break
             if not found:
                 missing = True
                 msg += "\n  Material '%s' not found." % (name)
@@ -77,22 +121,27 @@ class NullSpaceMultiBody(PetscComponent):
     return
 
 
-  def initialize(self, materials):
+  def initialize(self, fields, formulation):
     """
     Initialize object.
     """
-    numMaterials = len(materials.components())
-    bodiesIds = [0]*numMaterials
-    bodiesCount = [0]*len(self.bodies)
-    for ibody,body in enumerate(bodies):
-        for icount,name in enumerate(body):
-            for material in materials.components():
-                if name == material.name:
-                    bodyIds[ibody] = material.id()
-                    bodiesCount[iCount] += 1
+    import numpy
+    
+    numBodies = len(self.bodies.components())
+    numMaterialsInBodies = numpy.zeros((numBodies,), dtype=numpy.int32)
+    numMaterials = len(self.materials.components())
+    bodiesIds = numpy.zeros((numMaterials,), dtype=numpy.int32)
+    index = 0
+    for ibody,body in enumerate(self.bodies.components()):
+        for icount,name in enumerate(body.materials):
+            for material in self.materials.components():
+                materialFacility = material.aliases[-1]
+                if name == materialFacility:
+                    bodiesIds[index] = material.id()
+                    numMaterialsInBodies[ibody] += 1
+                    index += 1
 
-    numBodies = len(self.bodies)
-    ModuleNullSpaceBodies.bodies(self, bodiesIds, numMaterials, bodiesCount, numBodies)
+    formulation.createNullSpaceBodies(fields, numMaterialsInBodies, bodiesIds)
     return
 
   # PRIVATE METHODS /////////////////////////////////////////////////////
@@ -101,25 +150,18 @@ class NullSpaceMultiBody(PetscComponent):
     """
     Set members based using inventory.
     """
-    PetscComponent._configure(self)
+    NullSpace._configure(self)
+    self.bodies = self.inventory.bodies
     return
 
 
-  def _createModuleObj(self):
-    """
-    Create handle to C++ NullSpaceMultiBody.
-    """
-    ModuleNullSpaceMultiody.__init__(self)
-    return
-    
-  
 # FACTORIES ////////////////////////////////////////////////////////////
 
 def null_space():
   """
   Factory associated with NullSpace.
   """
-  return NullSpaceNone()
+  return NullSpaceMultiBody()
 
 
 # End of file 

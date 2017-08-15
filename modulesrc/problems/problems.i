@@ -48,6 +48,15 @@
 %include "../include/integratorarray.i"
 %include "../include/scalartypemaps.i"
 
+// Numpy interface stuff
+%{
+#define SWIG_FILE_WITH_INIT
+%}
+%include "../include/numpy.i"
+%init %{
+import_array();
+%}
+
 // Interfaces
 %include "Formulation.i"
 %include "Explicit.i"

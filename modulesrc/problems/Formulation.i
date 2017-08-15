@@ -35,6 +35,7 @@ namespace pylith {
       Formulation(void);
 
       /// Destructor
+      virtual
       ~Formulation(void);
 
       /// Deallocate PETSc and local data structures.
@@ -113,6 +114,29 @@ namespace pylith {
 			  const PylithScalar t,
 			  const PylithScalar dt);
 
+%apply(int* IN_ARRAY1, int DIM1) {
+  (PetscInt* const numMaterialsInBodies, const PetscInt numBodies)
+  };
+%apply(int* IN_ARRAY1, int DIM1) {
+  (PetscInt* const bodiesMaterialIds, const PetscInt numMaterials)
+  };
+      /** Create null space associated with rigid body motion for multiple
+       * bodies.
+       *
+       * @param fields Solution fields.
+       * @param numMaterialsInBodies Array with number of materials in each body.
+       * @param numBodies Number of bodies in domain (size of numMaterialsInBodies array).
+       * @param bodiesMaterialIds Array of material ids for each body.
+       * @param numMaterials Number of materials (size of bodiesMoterialIds array).
+       */
+      void createNullSpaceBodies(const pylith::topology::SolutionFields& fields,
+				 PetscInt* const numMaterialsInBodies,
+				 const PetscInt numBodies,
+				 PetscInt* const bodiesMaterialIds,
+				 const PetscInt numMaterials);
+%clear(PetscInt* const numMaterialsInBodies, const PetscInt numBodies);
+%clear(PetscInt* const bodiesMaterialIds, const PetscInt numMaterials);
+      
       /** Reform system residual.
        *
        * @param tmpResidualVec Temporary PETSc vector for residual.

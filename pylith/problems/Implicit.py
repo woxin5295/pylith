@@ -162,6 +162,7 @@ class Implicit(Formulation, ModuleImplicit):
     if 0 == comm.rank:
       self._info.log("Initializing solver.")
     self.solver.initialize(self.fields, self.jacobian, self)
+    self.nullSpace.initialize(self.fields, self)
     self._debug.log(resourceUsageString())
 
     #memoryLogger.stagePop()
