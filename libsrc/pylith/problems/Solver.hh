@@ -63,19 +63,6 @@ public :
   virtual
   void deallocate(void);
   
-  /** Create null space associated with rigid body motion for multiple
-   * bodies..
-   *
-   * @param fields Solution fields.
-   * @param numBodies Number of bodies in domain.
-   * @param numMaterialsInBodies Array with number of materials in each body.
-   * @param bodiesMaterialIds Array of material ids for each body.
-   */
-    void createNullSpaceBodies(const topology::SolutionFields& fields,
-			       const PetscInt numBodies,
-			       const PetscInt numMaterialsInBodies[],
-			       const PetscInt bodiesMaterialIds[]);
-
   /** Initialize solver.
    *
    * @param fields Solution fields.

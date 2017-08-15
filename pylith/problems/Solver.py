@@ -52,9 +52,6 @@ class Solver(PetscComponent):
 
     import pyre.inventory
 
-    nullSpace = pyre.inventory.facility("null_space", default=NullSpaceSingleBody, factory="null_space")
-    nullSpace.meta['tip'] = "Create null space for solver with rigid body motion for a single body. Domains with through-going faults have multiple bodies and should use NullSpaceMultiBody."
-
   # PUBLIC METHODS /////////////////////////////////////////////////////
 
   def __init__(self, name="solver"):
@@ -62,21 +59,8 @@ class Solver(PetscComponent):
     Constructor.
     """
     PetscComponent.__init__(self, name, facility="solver")
-    self._createModuleObject()
+    self._createModuleObj()
     return
-
-
-  def verifyConfiguration(self, materials):
-    """
-    Verify configuration
-    """
-    self.nullSpace.verifyConfiguration(materials)
-    return
-
-  def initialize(self, materials):
-    self.nullSpace.initialize(materials)
-    return
-
 
   # PRIVATE METHODS /////////////////////////////////////////////////////
 
@@ -85,8 +69,6 @@ class Solver(PetscComponent):
     Set members based using inventory.
     """
     PetscComponent._configure(self)
-
-    self.nullSpace = self.inventory.nullSpace
     return
 
 

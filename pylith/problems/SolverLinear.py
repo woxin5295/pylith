@@ -57,11 +57,10 @@ class SolverLinear(Solver, ModuleSolverLinear):
     return
 
 
-  def initialize(self, materials, fields, jacobian, formulation):
+  def initialize(self, fields, jacobian, formulation):
     """
     Initialize linear solver.
     """
-    Solver.initialize(materials)
     ModuleSolverLinear.initialize(self, fields, jacobian, formulation)
     return
 

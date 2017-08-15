@@ -124,10 +124,6 @@ pylith::problems::SolverNonlinear::initialize(const topology::SolutionFields& fi
     _setupFieldSplit(&pc, formulation, jacobian, fields);
   } // if
 
-  if (!_skipNullSpaceCreation) {
-    _createNullSpace(fields);
-  } // if
-
   PYLITH_METHOD_END;
 } // initialize
 

@@ -87,10 +87,6 @@ pylith::problems::SolverLinear::initialize(const topology::SolutionFields& field
     _setupFieldSplit(&pc, formulation, jacobian, fields);
   } // if
 
-  if (!_skipNullSpaceCreation) {
-    _createNullSpace(fields);
-  } // if
-  
   PYLITH_METHOD_END;
 } // initialize
 

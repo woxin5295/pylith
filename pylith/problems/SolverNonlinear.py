@@ -58,6 +58,13 @@ class SolverNonlinear(Solver, ModuleSolverNonlinear):
     return
 
 
+  def initialize(self, fields, jacobian, formulation):
+    """
+    Initialize linear solver.
+    """
+    ModuleSolverNonlinear.initialize(self, fields, jacobian, formulation)
+    return
+
   # PRIVATE METHODS /////////////////////////////////////////////////////
 
   def _configure(self):
