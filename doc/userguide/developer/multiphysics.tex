@@ -144,9 +144,8 @@ matrix.
 We begin with the elasticity equation including the inertial term,
 \begin{gather}
   \label{eqn:elasticity:strong:form}
-  \rho \frac{\partial^2\vec{u}}{\partial t^2} - \vec{f}(\vec{x},t) - \tensor{\nabla} \cdot 
-\tensor{\sigma}
-(\vec{u}) = \vec{0} \text{ in }\Omega, \\
+  \rho \frac{\partial^2\vec{u}}{\partial t^2} - \vec{f}(\vec{x},t) - \tensor{\nabla} \cdot \tensor{\sigma}
+  (\vec{u}) = \vec{0} \text{ in }\Omega, \\
 %
   \label{eqn:bc:Neumann}
   \tensor{\sigma} \cdot \vec{n} = \vec{\tau}(\vec{x},t) \text{ on }\Gamma_\tau, \\
@@ -200,7 +199,8 @@ have
   \vec{0} &= \vec{f}(\vec{x},t) + \tensor{\nabla} \cdot \tensor{\sigma}(\vec{u}) \text{ in }
 \Omega, \\
 % Neumann
-  \tensor{\sigma} \cdot \vec{n} &= \vec{\tau}(\vec{x},t) \text{ on }\Gamma_\tau, \\
+  \tensor{\sigma} \cdot \vec{n} &= \vec{\tau}(\vec{x},t) \text{ on
+                                  }\Gamma_{\tau}, \\
 % Dirichlet
   \vec{u} &= \vec{u}_0(\vec{x},t) \text{ on }\Gamma_u.
 \end{align}
@@ -548,8 +548,8 @@ If the reference stress and reference strain are both zero, then this reduces to
 
 For isotropic linear elasticity
 \begin{align}
-  C_{1112} &= C_{1113} = C_{1113} = C_{1121} = C_{1123} = C_{1131} = C_{1132} = 0\\
-  C_{1211} &= C_{1213} = C_{1222} = C_{1223} = C_{1231} = C_{1232} = C_{1233} = 0,
+  C_{1112} &= C_{1113} = C_{1121} = C_{1123} = C_{1131} = C_{1132} = 0,\\
+  C_{1213} &= C_{1222} = C_{1223} = C_{1231} = C_{1232} = C_{1233} = 0,
 \end{align}
 and
 \begin{align}
@@ -586,14 +586,15 @@ spring in parallel with the Maxwell models, the $\mu_{m}$ are the
 fraction of the shear modulus accommodated by each Maxwell model
 spring, and $\epsilon^{\mathit{refdev}}_{ij}$ and
 $\sigma^{\mathit{refdev}}_{ij}$ are the reference deviatioric strain
-and stress, respectively. The viscous strain is:
+and stress, respectively. Note that for a single Maxwell model we set
+${\mu}_0=0$ and $m=1$. The viscous strain is:
 \begin{equation}
 h^{m}_{ij}\left(t\right)=\exp\frac{-\Delta
   t}{\tau_{m}}h^{m}_{ij}\left(t_{n}\right)+\Delta h^{m}_{ij},
 \end{equation}
 where $t_{n}$ is a time between $t=0$ and $t=t$, $\Delta
 h^{m}_{ij}$ is the viscous strain between $t=t_{n}$ and
-$t=t$, and $\tau_{m}$ is the Maxwell time:
+$t=t$, and $\tau_{m}$ is the Maxwell time for Maxwell element $m$:
 \begin{equation}
   \tau_{m}=\frac{\eta_{m}}{\mu_{tot}\mu_{m}}.
 \end{equation}
@@ -604,15 +605,28 @@ this is given as:
   t}{\tau_{m}}\right)\left(\epsilon^{\mathit{dev}}_{ij}\left(t\right)-\epsilon^{\mathit{dev}}_{ij}\left(t_{n}\right)\right)=\Delta
 h^{m}\left(\epsilon^{\mathit{dev}}_{ij}\left(t\right)-\epsilon^{\mathit{dev}}_{ij}\left(t_n\right)\right).
 \end{equation}
-The approximation is singular for zero time steps, but a series
-expansion may be used for small time-step sizes:
+
+The Jacobian for the Generalized Maxwell material is:
+\begin{align}
+  C_{1112} &= C_{1113} = C_{1121} = C_{1123} = C_{1131} = C_{1132} = 0,\\
+  C_{1213} &= C_{1222} = C_{1223} = C_{1231} = C_{1232} = C_{1233} = 0,
+\end{align}
+and
+\begin{align}
+  C_{1111} = C_{2222} = C_{3333} &= K + \frac{4}{3} H, \\
+  C_{1122} = C_{1133} = C_{2233} &= K - \frac{2}{3} H, \\
+  C_{1212} = C_{2323} = C_{1313} &= H,
+\end{align}
+where $H$ is given by:
 \begin{equation}
-  \Delta h^{m}\approx1-\frac{1}{2}\left(\frac{\Delta
-    t}{\tau_{m}}\right)+\frac{1}{3!}\left(\frac{\Delta
-    t}{\tau_{m}}\right)^{2}-\frac{1}{4!}\left(\frac{\Delta
-    t}{\tau_{m}}\right)^{3}+\cdots\,.
+  H=2\mu_{tot}\left(\mu_{0}+\sum_{m=1}^{N}\mu_{m}{\Delta}h^{m}\right).
 \end{equation}
-This converges with only a few terms.
+The deviatoric elastic constants are:
+\begin{align}
+  C^\mathit{dev}_{1111} = C^\mathit{dev}_{2222} = C^\mathit{dev}_{3333} &= \frac{4}{3}H, \\
+  C^\mathit{dev}_{1122} = C^\mathit{dev}_{1133} = C^\mathit{dev}_{2233} &= -\frac{2}{3}H, \\
+  C^\mathit{dev}_{1212} = C^\mathit{dev}_{2323} = C^\mathit{dev}_{1313} &= H.
+\end{align}
 
 
 % ----------------------------------------------------------------------
@@ -626,7 +640,8 @@ fault,
 \tensor{\sigma}
 (\vec{u}) = \vec{0} \text{ in }\Omega, \\
 %
-  \tensor{\sigma} \cdot \vec{n} = \vec{\tau}(\vec{x},t) \text{ on }\Gamma_\tau, \\
+  \tensor{\sigma} \cdot \vec{n} = \vec{\tau}(\vec{x},t) \text{ on
+  }\Gamma_{\tau}, \\
 %
   \vec{u} = \vec{u}_0(\vec{x},t) \text{ on }\Gamma_u, \\
 %
@@ -965,12 +980,12 @@ unknowns, we have
   % Solution
   % \vec{s}^T = \left( \vec{u} \ p \right)^T, \\
   % Static equilibrium
-  \vec{0} &= \vec{f}(\vec{x},t) + \tensor{\nabla} \cdot \tensor{\sigma}(\vec{u}) \text{ in }
+  \vec{0} = \vec{f}(\vec{x},t) + \tensor{\nabla} \cdot \tensor{\sigma}(\vec{u}) \text{ in }
   \Omega, \\
   % Pressure
   0 = \vec{\nabla} \cdot \vec{u} + \frac{p}{K}, \\
   % Neumann
-  \tensor{\sigma} \cdot \vec{n} = \vec{\tau} \text{ on }\Gamma_\tau, \\
+  \tensor{\sigma} \cdot \vec{n} = \vec{\tau} \text{ on }\Gamma_{\tau}, \\
   % Dirichlet
   \vec{u} = \vec{u}_0 \text{ on }\Gamma_u, \\
   p = p_0 \text{ on }\Gamma_p.
