@@ -634,6 +634,7 @@ Laboratory results on rock rheology are typically performed using a
 triaxial experiment, and the creep data are fit to a power-law
 equation of the form (e.g., \cite{Kirby:Kronenberg:1987}):
 \begin{equation}
+  \label{eqn:visco:powerlaw:lab}
   \dot{\epsilon}_{11}^{C}=A_{E}\exp\left(\frac{-Q}{RT}\right)\left(\sigma_{1}-\sigma_{3}\right)^{n}=A_{E}\exp\left(\frac{-Q}{RT}\right)\sigma_{d}^{n}\:,
 \end{equation}
 where $\dot{\epsilon}_{11}^{C}$ is the strain rate in the direction of
@@ -649,21 +650,21 @@ systems (e.g., \cite{Paterson:1994}). The flow law may then be
 generalized in terms of the deviatoric stress and strain rate
 invariants:
 \begin{equation}
-  \sqrt{\dot{L}_{2}^{dev\:
+  \sqrt{\dot{L}_{2}^{dev\;
       C}}=A_{M}\exp\left(\frac{-Q}{RT}\right)\sqrt{J_{2}^{dev}}^{n}\:,
 \end{equation} where $A_{M}$ is now a pre-exponential constant used in
-the formulation for modeling, $\dot{L}_{2}^{dev\:C}$ is the second
+the formulation for modeling, $\dot{L}_{2}^{dev\;C}$ is the second
 invariant of the deviatoric creep strain rate, and $J_{2}^{dev}$ is the
 second deviatoric stress invariant:
 \begin{gather}
-  \dot{L}_{2}^{dev\:
-    C}=\frac{1}{2}\dot{\epsilon}_{ij}^{dev\:C}\dot{\epsilon}_{ij}^{dev\:C},\\
+  \dot{L}_{2}^{dev\;
+    C}=\frac{1}{2}\dot{\epsilon}_{ij}^{dev\;C}\dot{\epsilon}_{ij}^{dev\;C},\\
   J_{2}^{dev}=\frac{1}{2}\sigma_{ij}^{dev}\sigma_{ij}^{dev}.
 \end{gather}
 In practice, it is necessary to compute each strain
 rate component using the flow law. This is accomplished using:
 \begin{equation}
-  \dot{\epsilon}_{ij}^{dev\:C}=A_{M}\exp\left(\frac{-Q}{RT}\right)\sqrt{J_{2}^{dev}}^{n-1}\sigma_{ij}^{dev}\:.
+  \dot{\epsilon}_{ij}^{dev\;C}=A_{M}\exp\left(\frac{-Q}{RT}\right)\sqrt{J_{2}^{dev}}^{n-1}\sigma_{ij}^{dev}\:.
 \end{equation}
   
 In a triaxial experiment with confining pressure $P_{c}$, we have
@@ -685,20 +686,164 @@ This gives
 \end{gather}
 In terms of the second deviatoric stress invariant, we then have
 \begin{equation}
+  \label{eqn:visco:powerlaw:devstress}
   \sqrt{J_{2}^{dev}}=\frac{\sigma_{d}}{\sqrt{3}}\:.
 \end{equation}
 
 Under the assumption that the creep measured in the laboratory experiments
 is incompressible, we have
 \begin{gather}
-  \dot{\epsilon}_{11}^{dev\:C}=\dot{\epsilon}_{11}\\
-  \dot{\epsilon}_{22}^{dev\:C}=\dot{\epsilon}_{33}^{dev\:C}=-\frac{1}{2}\dot{\epsilon}_{11}\:.
+  \dot{\epsilon}_{11}^{dev\;C}=\dot{\epsilon}_{11}\\
+  \dot{\epsilon}_{22}^{dev\;C}=\dot{\epsilon}_{33}^{dev\;C}=-\frac{1}{2}\dot{\epsilon}_{11}\:.
 \end{gather}
 In terms of the second deviatoric strain rate invariant we then have
 \begin{equation}
-  \sqrt{\dot{L}_{2}^{dev:\C}}=\frac{\sqrt{3}}{2}\dot{\epsilon}_{11}\:.
+  \label{eqn:visco:powerlaw:devstrain}
+  \sqrt{\dot{L}_{2}^{dev\;C}}=\frac{\sqrt{3}}{2}\dot{\epsilon}_{11}\:.
+\end{equation}
+Substituting Equations~\ref{eqn:visco:powerlaw:devstress}
+and~\ref{eqn:visco:powerlaw:devstrain} into Equation~\ref{eqn:visco:powerlaw:lab}, we obtain
+\begin{equation}
+  \sqrt{\dot{L}_{2}^{dev\;C}}=A_{E}\frac{\sqrt{3}^{n+1}}{2}\exp\left(\frac{-Q}{RT}\right)\sqrt{J_{2}^{dev}}^{n}\:,
+\end{equation}
+and therefore,
+\begin{equation}
+  A_{M}=\frac{\sqrt{3}^{n+1}}{2}A_{E}\:.
+\end{equation}
+When the exponential factor is included, we define a new parameter:
+\begin{equation}
+  \label{eqn:visco:powerlaw:AT}
+  A_{T}=A_{M}\exp\left(\frac{-Q}{RT}\right)=\frac{\sqrt{3}^{n+1}}{2}A_{E}\exp\left(\frac{-Q}{RT}\right)\:.
 \end{equation}
 
+\charles{We are missing a bunch of introductory material for the
+equations below. Once this is done properly, we should probably have
+an introductory section for viscoelastic materials (or maybe a section
+for all materials) where we define a bunch of parameters and methods
+(e.g., stress and strain rate invariants, alpha method of time
+integration, etc.).}
+
+There is a problem with the usage of parameters $A_{E}$, $A_{M}$,
+and $A_{T}$. Since the dimensions of these parameters are dependent
+on the value of the power-law exponent, they are not really constants.
+In addition to being logically inconsistent, this presents problems
+when specifying parameters for PyLith, since the power-law exponent
+must be known before the units can be determined. An alternative way
+of writing the flow rule is (e.g., \cite{Prentice:1968}): 
+\begin{equation}
+  \frac{\sqrt{\dot{L}_{2}^{dev\;C}}}{\dot{\epsilon}_{0}^{dev}}=\left(\frac{\sqrt{J_{2}^{dev}}}{\sigma_{0}^{dev}}\right)^{n},
+\end{equation}
+where $\dot{\epsilon}_{0}^{dev}$ and $\sigma_{0}^{dev}$ are reference
+values for the deviatoric strain rate and stress. This means that
+\begin{equation}
+  \frac{\dot{\epsilon}_{0}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}=A_{T}\:.
+\end{equation}
+Users must therefore specify three parameters for a power-law material.
+The properties \texttt{reference-strain-rate}, \texttt{reference-stress}, 
+and \texttt{power-law-exponent} in Table \vref{tab:materials:powerlaw} refer
+to $\dot{\epsilon}_{0}^{dev}$, $\sigma_{0}^{dev}$, and $n$, respectively. To specify the
+power-law properties for PyLith using laboratory results, the user
+must first compute $A_{T}$ using Equation~\ref{eqn:visco:powerlaw:AT}. Then, values
+for $\dot{\epsilon}_{0}^{dev}$ and $\sigma_{0}^{dev}$ must be provided. The simplest method
+is probably to assume a reasonable value for the reference strain
+rate, and then compute $\sigma_{0}^{dev}$ as
+\begin{equation}
+  \sigma_{0}^{dev}=\left(\frac{\dot{\epsilon}_{0}^{dev}}{A_{T}}\right)^{\frac{1}{n}}\:.
+\end{equation}
+
+A utility code (\texttt{powerlaw\_gendb.py}) is provided to convert
+laboratory results to the properties used by PyLith. To use the code,
+users must specify the spatial variation of $A_{E}$, $Q$, $n$,
+and $T$. An additional parameter is given to define the units of
+$A_{E}$. The user then specifies either a reference stress or a reference
+strain rate, and a database suitable for PyLith is generated. This
+utility is described more fully in Section
+\vref{sec:example:3dhex8:step08}.
+
+The flow law in component form is 
+\begin{equation}
+  \label{eqn:visco:powerlaw:flowlawcomponent}
+  \dot{\epsilon}_{ij}^{dev\;C}=\frac{\dot{\epsilon}_{0}^{dev}\sqrt{J_{2}^{dev}}^{n-1}\sigma_{ij}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}\:,
+\end{equation}
+and the creep strain increment is approximated as
+\begin{equation}
+  \label{eqn:visco:powerlaw:creepincrcomponents}
+\underline{\Delta \epsilon}^{dev\;C}\approx\frac{\Delta
+  t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}\,^{\tau}\underline{\sigma}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}=\frac{\Delta
+  t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n-1}\,^{\tau}\underline{\sigma}^{dev}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}\,
+\end{equation}
+Therefore,
+\begin{equation}
+  \label{eqn:visco:powerlaw:creepincrscalar}
+\Delta\bar{\epsilon}^{dev\;C}\approx\frac{2\Delta
+  t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}=\frac{2\Delta
+  t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n}}{\sqrt{3}^{n+1}\left(\sigma_{0}^{dev}\right)^{n}}\,,\;\textrm{and}\;^{\tau}\gamma=\frac{\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}}{\left(\sigma_{0}^{dev}\right)^{n}}\,.
+\end{equation}
+Substituting Equations \charles{Eqn not available yet},
+~\ref{eqn:visco:powerlaw:creepincrcomponents}, and
+~\ref{eqn:visco:powerlaw:creepincrscalar},
+into \charles{Eqn not available yet}, we obtain:
+\begin{equation}
+  \label{eqn:visco:powerlaw:stresstplusdt}
+  ^{t+\Delta t}\underline{\sigma}^{dev}=\frac{1}{a_{E}}\left\{
+    ^{t+\Delta t}\underline{\epsilon}^{\prime\;dev}-\Delta
+    t\phantom{}^{\tau}\gamma\left[\left(1-\alpha\right)^{t}\underline{\sigma}^{dev}+\alpha{}^{t+\Delta
+        t}\underline{\sigma}^{dev}\right]\right\}
+  +\underline{\sigma}^{refdev}\,,
+\end{equation}
+which may be rewritten:
+\begin{equation}
+^{t+\Delta t}\underline{\sigma}^{dev}\left(a_{E}+\alpha\Delta
+  t\phantom{}^{\tau}\gamma\right)={}^{t+\Delta
+  t}\underline{\epsilon}^{\prime\;dev}-\Delta
+t\phantom{}^{\tau}\gamma\left(1-\alpha\right)^{t}\underline{\sigma}^{dev}+a_{E}\underline{\sigma}^{refdev}\,.
+\end{equation}
+Taking the scalar inner product of both sides we obtain:
+\begin{gather}
+  \label{eqn:visco:powerlaw:effstressfn}
+  a^{2}\,\,{}^{t+\Delta t}J_{2}^{dev}-b+c\phantom{}^{\tau}\gamma-d^{2}\,^{\tau}\gamma^{2}=F=0\,,
+\end{gather}
+where
+\begin{gather}
+  a=a_{E}+\alpha\Delta t\phantom{}^{\tau}\gamma\,\,\nonumber \\
+  b=\frac{1}{2}{}^{t+\Delta
+    t}\underline{\epsilon}^{\prime\;dev}\cdot{}^{t+\Delta
+    t}\underline{\epsilon}^{\prime\;dev}+a_{E}{}^{t+\Delta
+    t}\underline{\epsilon}^{\prime\;dev}\cdot\underline{\sigma}^{refdev}+a_{E}^{2}J_{2}^{refdev}\,.\\
+  c=\Delta t\left(1-\alpha\right){}^{t+\Delta
+    t}\underline{\epsilon}^{\prime\;dev}\cdot^{t}\underline{\sigma}^{dev}+\Delta
+  t\left(1-\alpha\right)a_{E}\,^{t}\underline{\sigma}^{dev}\cdot\underline{\sigma}^{refdev}\,\,\nonumber \\
+  d=\Delta t\left(1-\alpha\right)\sqrt{^{t}J_{2}^{dev}}\,\,\nonumber 
+\end{gather}
+Equation~\ref{eqn:visco:powerlaw:effstressfn} is a function of a
+single unknown -- the square root of the second deviatoric stress
+invariant at time $t+\Delta t$ -- and may be solved by bisection or by
+Newton's method. Once this parameter has been found, the deviatoric
+stresses for the current time step may be found from Equations
+\charles{Eqn not available yet},
+~\ref{eqn:visco:powerlaw:creepincrscalar}, and
+~\ref{eqn:visco:powerlaw:stresstplusdt}, and the total stresses may be
+found by combining the deviatoric and volumetric components from
+Equation \charles{Eqn not available yet}.
+
+Once the stresses are computed for the current time step, we can compute
+the relaxation time (used in computing the stable time step) by first
+computing the effective viscous strain rate from
+Equation~\ref{eqn:visco:powerlaw:flowlawcomponent}:
+\begin{equation}
+  \dot{\bar{\epsilon}}^{dev\;C}=\frac{2\dot{\epsilon}_{0}^{dev}\left(\frac{\bar{\sigma}^{dev}}{\sqrt{3}}\right)^{n}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}\:.
+\end{equation}
+Similarly, the effective elastic strain is computed as:
+\begin{equation}
+  \bar{\epsilon}^{dev\;E}=\frac{\bar{\sigma}^{dev}}{3\mu}\:.
+\end{equation}
+The relaxation time is then the ratio between these two:
+\begin{equation}
+  \label{eqn:visco:powerlaw:relaxationtime}
+  \tau=\frac{\bar{\epsilon}^{dev\;E}}{\bar{\dot{\epsilon}}^{dev\;C}}=\left(\frac{\sigma_{0}^{dev}}{\sqrt{J_{2}^{dev}}}\right)^{n-1}\frac{\sigma_{0}^{dev}}{6\mu\dot{\epsilon}_{0}^{dev}}\:.
+\end{equation}
+The stable time step returned by PyLith is 1/5 of the value computed
+from Equation~\ref{eqn:visco:powerlaw:relaxationtime}.
 % ----------------------------------------------------------------------
 \section{Elasticity With Infinitesimal Strain and Faults With Prescribed Slip}
 
