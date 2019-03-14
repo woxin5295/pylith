@@ -43,32 +43,68 @@ X = [x, y, z]
 U = [u1(x,y,z), u2(x,y,z), u3(x,y,z)]
 
 # Deformation gradient, transpose, and strain tensor.
-defGrad = sympy.tensor.array.derive_by_array(U, X)
-defGradTranspose = sympy.tensor.array.Array(defGrad.tomatrix().transpose())
-strain = (defGrad + defGradTranspose)/two
+defGrad = sympy.derive_by_array(U, X)
+defGradTranspose = defGrad.transpose()
+strain = ((defGrad + defGradTranspose)/two).tomatrix()
 
 # Define volumetric strain and deviatoric strain.
-volStrain = sympy.tensor.array.tensorcontraction(strain, (0, 1))
-volStrainArr = sympy.tensor.array.tensorproduct(volStrain, sympy.eye(ndim))
+volStrain = sympy.tensorcontraction(strain, (0, 1))
+volStrainArr = volStrain * sympy.eye(ndim)
 devStrain = strain - volStrainArr/three
 
 # Define displacements and strains for previous time step.
 un1, un2, un3 = sympy.symbols('un1 un2 un3', type="Function")
 Un = [un1(x,y,z), un2(x,y,z), un3(x,y,z)]
-defGradN = sympy.tensor.array.derive_by_array(Un, X)
-defGradNTranspose = sympy.tensor.array.Array(defGradN.tomatrix().transpose())
-strainN = (defGradN + defGradNTranspose)/two
-meanStrainN = sympy.tensor.array.tensorcontraction(strainN, (0, 1))/three
-meanStrainNArr = sympy.tensor.array.tensorproduct(meanStrainN, sympy.eye(ndim))
+defGradN = sympy.derive_by_array(Un, X)
+defGradNTranspose = defGradN.transpose()
+strainN = ((defGradN + defGradNTranspose)/two).tomatrix()
+meanStrainN = sympy.tensorcontraction(strainN, (0, 1))/three
+meanStrainNArr = meanStrainN * sympy.eye(ndim)
 devStrainN = strainN - meanStrainNArr
 
 # Put in dummy tensor for things that don't depend on U.
 aa, ab, ac, ba, bb, bc, ca, cb, cc = sympy.symbols('aa ab ac ba bb bc ca cb cc')
-dummyTensor = sympy.tensor.array.Array([[aa, ab, ac],
-                                        [ba, bb, bc],
-                                        [ca, cb, cc]])
+dummyTensor = sympy.Matrix([[aa, ab, ac],
+                            [ba, bb, bc],
+                            [ca, cb, cc]])
 
 # ----------------------------------------------------------------------
+def divideTensors(t1, t2):
+  """
+  Function to divide each element of t1 by the corresponding element of t2.
+  """
+  from sympy import MutableDenseNDimArray
+  tRank = t1.rank()
+  tSize = t1.shape[0]
+  tLen = tSize**tRank
+  tReturn = MutableDenseNDimArray(range(tLen), t2.shape)
+  for elem in range(tLen):
+    tReturn[elem] = t1[elem]/t2[elem]
+
+  return tReturn
+
+
+def innerProd(mat1, mat2):
+  """
+  Function to compute the scalar inner product of two matrices.
+  I am sure there is a much easier way to do this.
+  """
+  test1 = isinstance(mat1, sympy.MutableDenseMatrix)
+  test2 = isinstance(mat2, sympy.MutableDenseMatrix)
+  m1 = mat1.copy()
+  m2 = mat2.copy()
+  if (not test1):
+    m1 = mat1.tomatrix()
+  if (not test2):
+    m2 = mat2.tomatrix()
+  matMult = sympy.matrix_multiply_elementwise(m1, m2)
+  rowSum = matMult * sympy.ones(matMult.shape[1], 1)
+  colSum = sympy.ones(1, rowSum.shape[0]) * rowSum
+  scalarProd = colSum[0]
+
+  return scalarProd
+
+
 def writeJacobianUniqueVals(f, jacobian):
   """
   Function to write unique values and assign them to variables.
@@ -175,18 +211,16 @@ fileName = 'elasticity-elas_iso3d.txt'
 (lambdaModulus, shearModulus,
  bulkModulus) = sympy.symbols('lambdaModulus shearModulus bulkModulus')
 stress = lambdaModulus * volStrainArr + two * shearModulus * strain
-meanStress = sympy.tensor.array.tensorcontraction(stress, (0, 1))/three
-meanStressArr = sympy.tensor.array.tensorproduct(meanStress, sympy.eye(ndim))
+meanStress = sympy.tensorcontraction(stress, (0, 1))/three
+meanStressArr = meanStress * sympy.eye(ndim)
 devStress = stress - meanStressArr
-jacobian1 = sympy.tensor.array.derive_by_array(stress, defGrad)
-jacobian2 = sympy.tensor.array.derive_by_array(stress, defGradTranspose)
-jacobian = (jacobian1 + jacobian2)/two
+jacobian = sympy.derive_by_array(stress, defGrad)
 writeJacobianInfo(fileName, jacobian)
 
 # ----------------------------------------------------------------------
 # Maxwell viscoelastic.
 fileName = 'elasticity-max_iso3d.txt'
-shearModulus, deltaT, tauM = sympy.symbols('shearModulus deltaT tauM')
+deltaT, tauM = sympy.symbols('deltaT tauM')
 expFac = sympy.exp(-deltaT/tauM)
 dq = sympy.symbols('dq')
 delHArr = dq * (devStrain - devStrainN)
@@ -195,18 +229,15 @@ hMArr = expFac * dummyTensor + delHArr
 meanStress = bulkModulus * volStrainArr
 devStress = two * shearModulus * hMArr
 stress = meanStress + devStress
-jacobian1 = sympy.tensor.array.derive_by_array(stress, defGrad)
-jacobian2 = sympy.tensor.array.derive_by_array(stress, defGradTranspose)
-jacobian = (jacobian1 + jacobian2)/two
+jacobian = sympy.derive_by_array(stress, defGrad)
 writeJacobianInfo(fileName, jacobian)
 
 # ----------------------------------------------------------------------
 # Generalized Maxwell viscoelastic.
 fileName = 'elasticity-genmax_iso3d.txt'
-(shearModulus, deltaT, tauM1, tauM2, tauM3,
- shearModulusRatio_1, shearModulusRatio_2,
+(tauM1, tauM2, tauM3, shearModulusRatio_1, shearModulusRatio_2,
  shearModulusRatio_3) = sympy.symbols(
-  'shearModulus deltaT tauM1 tauM2 tauM3 shearModulusRatio_1 shearModulusRatio_2 shearModulusRatio_3')
+  'tauM1 tauM2 tauM3 shearModulusRatio_1 shearModulusRatio_2 shearModulusRatio_3')
 shearModulusRatio_0 = sympy.symbols('shearModulusRatio_0')
 expFac1 = sympy.exp(-deltaT/tauM1)
 expFac2 = sympy.exp(-deltaT/tauM2)
@@ -225,7 +256,48 @@ devStress = two * shearModulus * (shearModulusRatio_0 * devStrain + \
                                   shearModulusRatio_2 * hMArr2 + \
                                   shearModulusRatio_3 * hMArr3)
 stress = meanStress + devStress
-jacobian1 = sympy.tensor.array.derive_by_array(stress, defGrad)
-jacobian2 = sympy.tensor.array.derive_by_array(stress, defGradTranspose)
-jacobian = (jacobian1 + jacobian2)/two
+jacobian = sympy.derive_by_array(stress, defGrad)
+writeJacobianInfo(fileName, jacobian)
+
+# ----------------------------------------------------------------------
+# Power-law viscoelastic.
+fileName = 'elasticity-powerlaw_iso3d.txt'
+aT, n, alpha = sympy.symbols('aT n alpha')
+s11, s12, s13, s22, s23, s33 = sympy.symbols('s11 s12 s13 s22 s23 s33')
+s11T, s12T, s13T, s22T, s23T, s33T = sympy.symbols(
+  's11T s12T s13T s22T s23T s33T')
+s11FTau, s12FTau, s13FTau, s22FTau, s23FTau, s33FTau = sympy.symbols(
+  's11FTau s12FTau s13FTau s22FTau s23FTau s33FTau')
+j2FTplusDt, j2Ft, j2FTau, gammaFTau = sympy.symbols(
+  'j2FTplusDt j2Ft j2FTau gammaFTau')
+meanStress = bulkModulus * volStrainArr
+devStress = sympy.Matrix([[s11, s12, s13],
+                          [s12, s22, s23],
+                          [s13, s23, s33]])
+devStressT = sympy.Matrix([[s11T, s12T, s13T],
+                           [s12T, s22T, s23T],
+                           [s13T, s23T, s33T]])
+devStressTau = alpha*devStress + (one - alpha)*devStressT
+j2TplusDt = sympy.sqrt(innerProd(devStress, devStress))
+j2T = sympy.sqrt(innerProd(devStressT, devStressT))
+j2Tau = sympy.sqrt(innerProd(devStressTau, devStressTau))
+aE = one/(two*shearModulus)
+gammaTau = aT*(j2Tau)**(n-one)
+F = aE*devStress + devStressTau*gammaTau*deltaT - devStrain
+
+dFdStress = sympy.derive_by_array(F, devStress)
+dFdStressSimp = dFdStress.subs([(gammaTau, gammaFTau),
+                                (j2Tau, j2FTau),
+                                (devStressTau[0], s11FTau),
+                                (devStressTau[1], s12FTau),
+                                (devStressTau[2], s13FTau),
+                                (devStressTau[4], s22FTau),
+                                (devStressTau[5], s23FTau),
+                                (devStressTau[8], s33FTau)])
+
+dFdStrain = -sympy.derive_by_array(F, defGrad)
+
+jacobianDev = divideTensors(dFdStrain, dFdStressSimp)
+jacobianVol = sympy.derive_by_array(meanStress, defGrad)
+jacobian = jacobianDev + jacobianVol
 writeJacobianInfo(fileName, jacobian)
