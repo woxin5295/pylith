@@ -768,16 +768,16 @@ The flow law in component form is
 and the creep strain increment is approximated as
 \begin{equation}
   \label{eqn:visco:powerlaw:creepincrcomponents}
-\underline{\Delta \epsilon}^{dev\;C}\approx\frac{\Delta
-  t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}\,^{\tau}\underline{\sigma}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}=\frac{\Delta
-  t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n-1}\,^{\tau}\underline{\sigma}^{dev}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}\,
+  \Delta {\epsilon}_{ij}^{dev\;C}\approx\frac{\Delta
+    t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}\,^{\tau}{\sigma}_{ij}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}=\frac{\Delta
+    t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n-1}\,^{\tau}{\sigma}_{ij}^{dev}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}\,
 \end{equation}
 Therefore,
 \begin{equation}
   \label{eqn:visco:powerlaw:creepincrscalar}
-\Delta\bar{\epsilon}^{dev\;C}\approx\frac{2\Delta
-  t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}=\frac{2\Delta
-  t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n}}{\sqrt{3}^{n+1}\left(\sigma_{0}^{dev}\right)^{n}}\,,\;\textrm{and}\;^{\tau}\gamma=\frac{\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}}{\left(\sigma_{0}^{dev}\right)^{n}}\,.
+  \Delta\bar{\epsilon}^{dev\;C}\approx\frac{2\Delta
+    t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}=\frac{2\Delta
+    t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n}}{\sqrt{3}^{n+1}\left(\sigma_{0}^{dev}\right)^{n}}\,,\;\textrm{and}\;^{\tau}\gamma=\frac{\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}}{\left(\sigma_{0}^{dev}\right)^{n}}\,.
 \end{equation}
 Substituting Equations \charles{Eqn not available yet},
 ~\ref{eqn:visco:powerlaw:creepincrcomponents}, and
@@ -785,18 +785,19 @@ Substituting Equations \charles{Eqn not available yet},
 into \charles{Eqn not available yet}, we obtain:
 \begin{equation}
   \label{eqn:visco:powerlaw:stresstplusdt}
-  ^{t+\Delta t}\underline{\sigma}^{dev}=\frac{1}{a_{E}}\left\{
-    ^{t+\Delta t}\underline{\epsilon}^{\prime\;dev}-\Delta
-    t\phantom{}^{\tau}\gamma\left[\left(1-\alpha\right)^{t}\underline{\sigma}^{dev}+\alpha{}^{t+\Delta
-        t}\underline{\sigma}^{dev}\right]\right\}
-  +\underline{\sigma}^{refdev}\,,
+  ^{t+\Delta t}{\sigma}_{ij}^{dev}=2\mu\left\{
+    ^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}-\Delta
+    t\phantom{}^{\tau}\gamma\left[\left(1-\alpha\right)^{t}{\sigma}_{ij}^{dev}+\alpha{}^{t+\Delta
+        t}{\sigma}_{ij}^{dev}\right]\right\}
+  +{\sigma}_{ij}^{refdev}\,,
 \end{equation}
 which may be rewritten:
 \begin{equation}
-^{t+\Delta t}\underline{\sigma}^{dev}\left(a_{E}+\alpha\Delta
-  t\phantom{}^{\tau}\gamma\right)={}^{t+\Delta
-  t}\underline{\epsilon}^{\prime\;dev}-\Delta
-t\phantom{}^{\tau}\gamma\left(1-\alpha\right)^{t}\underline{\sigma}^{dev}+a_{E}\underline{\sigma}^{refdev}\,.
+  \label{eqn:visco:powerlaw:effstress}
+  ^{t+\Delta t}{\sigma}_{ij}^{dev}\left(\frac{1}{2\mu}+\alpha\Delta
+    t\phantom{}^{\tau}\gamma\right)={}^{t+\Delta
+    t}{\epsilon}_{ij}^{\prime\;dev}-\Delta
+  t\phantom{}^{\tau}\gamma\left(1-\alpha\right)^{t}{\sigma}_{ij}^{dev}+a_{E}{\sigma}_{ij}^{refdev}\,.
 \end{equation}
 Taking the scalar inner product of both sides we obtain:
 \begin{gather}
@@ -805,14 +806,16 @@ Taking the scalar inner product of both sides we obtain:
 \end{gather}
 where
 \begin{gather}
-  a=a_{E}+\alpha\Delta t\phantom{}^{\tau}\gamma\,\,\nonumber \\
-  b=\frac{1}{2}{}^{t+\Delta
-    t}\underline{\epsilon}^{\prime\;dev}\cdot{}^{t+\Delta
-    t}\underline{\epsilon}^{\prime\;dev}+a_{E}{}^{t+\Delta
-    t}\underline{\epsilon}^{\prime\;dev}\cdot\underline{\sigma}^{refdev}+a_{E}^{2}J_{2}^{refdev}\,.\\
-  c=\Delta t\left(1-\alpha\right){}^{t+\Delta
-    t}\underline{\epsilon}^{\prime\;dev}\cdot^{t}\underline{\sigma}^{dev}+\Delta
-  t\left(1-\alpha\right)a_{E}\,^{t}\underline{\sigma}^{dev}\cdot\underline{\sigma}^{refdev}\,\,\nonumber \\
+  a=\frac{1}{2\mu}+\alpha\Delta t\phantom{}^{\tau}\gamma\,\,\nonumber \\
+  b=\frac{1}{2}{}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}\cdot
+  {}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}+
+  \frac{{}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}\cdot
+    {\sigma}_{ij}^{refdev}}{2\mu}+\frac{J_{2}^{refdev}}{4\mu^{2}}\,.\\
+  c=\Delta t\left(1-\alpha\right){}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}\cdot
+  {}^{t}{\sigma}_{ij}^{dev}+
+  \frac{\Delta t\left(1-\alpha\right)\,^{t}{\sigma}_{ij}^{dev}\cdot
+    {\sigma}_{ij}^{refdev}}{2\mu}\,\,\nonumber
+  \\
   d=\Delta t\left(1-\alpha\right)\sqrt{^{t}J_{2}^{dev}}\,\,\nonumber 
 \end{gather}
 Equation~\ref{eqn:visco:powerlaw:effstressfn} is a function of a
@@ -844,6 +847,44 @@ The relaxation time is then the ratio between these two:
 \end{equation}
 The stable time step returned by PyLith is 1/5 of the value computed
 from Equation~\ref{eqn:visco:powerlaw:relaxationtime}.
+
+To compute the Jacobian for a power-law material, we begin by
+rewriting Equation~\ref{eqn:visco:powerlaw:stresstplusdt}:
+\begin{equation}
+  F=\frac{{}^{t+\Delta t}{\sigma}_{ij}^{dev}}{2\mu} +
+  {}^{tau}\gamma\Delta t{}^{\tau}\sigma_{ij}^{dev}
+    -{}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}-
+  \frac{{\sigma}_{ij}^{refdev}}{2\mu}=0\,.
+\end{equation}
+Using implicit differentiation, we can compute the derivatives of the
+deviatoric stress with respect to the displacement field. We then add
+the volumetric component to obtain the Jacobian components:
+\begin{align}
+  C_{1112} &= C_{1113} = C_{1121} = C_{1123} = C_{1131} = C_{1132} = 0,\\
+  C_{1213} &= C_{1222} = C_{1223} = C_{1231} = C_{1232} = C_{1233} =
+             0\,,
+\end{align}
+and
+\begin{align}
+  C_{1111} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{11}^{dev}\right)^{2}\left(n-1\right)}
+             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{2222} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{22}^{dev}\right)^{2}\left(n-1\right)}
+             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{3333} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{33}^{dev}\right)^{2}\left(n-1\right)}
+             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+% Finish fixing from here.**********
+  C_{1122} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{11}^{dev}\right)^{2}\left(n-1\right)}
+             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+\end{align}
+  
 % ----------------------------------------------------------------------
 \section{Elasticity With Infinitesimal Strain and Faults With Prescribed Slip}
 
