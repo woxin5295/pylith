@@ -772,6 +772,14 @@ and the creep strain increment is approximated as
     t\dot{\epsilon}_{0}^{dev}\sqrt{^{\tau}J_{2}^{dev}}^{n-1}\,^{\tau}{\sigma}_{ij}^{dev}}{\left(\sigma_{0}^{dev}\right)^{n}}=\frac{\Delta
     t\dot{\epsilon}_{0}^{dev}\left(\phantom{}^{\tau}\overline{\sigma}^{dev}\right)^{n-1}\,^{\tau}{\sigma}_{ij}^{dev}}{\sqrt{3}\left(\sigma_{0}^{dev}\right)^{n}}\,
 \end{equation}
+\charles{This part of the effective stress formulation still bothers
+  me. According to the Bathe book, we simultaneously have
+  ${}^{\tau}\sigma_{ij}^{dev}=\alpha{}^{t+{\Delta}t}\sigma_{ij}^{dev}+(1-\alpha){}^{t}\sigma_{ij}^{dev}$
+  and $\sqrt{{}^{\tau}J_{2}^{dev}} =
+  \alpha\sqrt{{}^{t+{\Delta}t}J_{2}^{dev}} +
+  (1-\alpha)\sqrt{{}^{t}J_{2}^{dev}}\,.$ This can only be true for
+  $\alpha=0$ (forward difference) or $\alpha=1$ (backward
+  difference).} 
 Therefore,
 \begin{equation}
   \label{eqn:visco:powerlaw:creepincrscalar}
@@ -852,7 +860,7 @@ To compute the Jacobian for a power-law material, we begin by
 rewriting Equation~\ref{eqn:visco:powerlaw:stresstplusdt}:
 \begin{equation}
   F=\frac{{}^{t+\Delta t}{\sigma}_{ij}^{dev}}{2\mu} +
-  {}^{tau}\gamma\Delta t{}^{\tau}\sigma_{ij}^{dev}
+  {}^{\tau}\gamma\Delta t{}^{\tau}\sigma_{ij}^{dev}
     -{}^{t+\Delta t}{\epsilon}_{ij}^{\prime\;dev}-
   \frac{{\sigma}_{ij}^{refdev}}{2\mu}=0\,.
 \end{equation}
@@ -866,23 +874,39 @@ the volumetric component to obtain the Jacobian components:
 \end{align}
 and
 \begin{align}
-  C_{1111} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+  C_{1111} &= K + \frac{2}{3\left[\alpha\Delta t{}^{\tau}\gamma +
              \frac{\alpha\Delta t{}^{\tau}\gamma
              \left(^{\tau}\sigma_{11}^{dev}\right)^{2}\left(n-1\right)}
-             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
-  C_{2222} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             {2{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{2222} &= K + \frac{2}{3\left[\alpha\Delta t{}^{\tau}\gamma +
              \frac{\alpha\Delta t{}^{\tau}\gamma
              \left(^{\tau}\sigma_{22}^{dev}\right)^{2}\left(n-1\right)}
-             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
-  C_{3333} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             {2{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{3333} &= K + \frac{2}{3\left[\alpha\Delta t{}^{\tau}\gamma +
              \frac{\alpha\Delta t{}^{\tau}\gamma
              \left(^{\tau}\sigma_{33}^{dev}\right)^{2}\left(n-1\right)}
-             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
-% Finish fixing from here.**********
-  C_{1122} &= \frac{2}{\left[\alpha\Delta t{}^{\tau}\gamma +
+             {2{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{1122} &= K - \frac{2{}^{\tau}J_{2}^{dev}}{3\alpha\Delta t{}^{\tau}\gamma
+             {}^{\tau}\sigma_{11}^{dev}{}^{\tau}\sigma_{22}^{dev}
+             \left(n-1\right)}\,, \\
+  C_{1133} &= K - \frac{2{}^{\tau}J_{2}^{dev}}{3\alpha\Delta t{}^{\tau}\gamma
+             {}^{\tau}\sigma_{11}^{dev}{}^{\tau}\sigma_{33}^{dev}
+             \left(n-1\right)}\,, \\
+  C_{2233} &= K - \frac{2{}^{\tau}J_{2}^{dev}}{3\alpha\Delta t{}^{\tau}\gamma
+             {}^{\tau}\sigma_{22}^{dev}{}^{\tau}\sigma_{33}^{dev}
+             \left(n-1\right)}\,, \\
+  C_{1212} &= \frac{1}{2\left[\alpha\Delta t{}^{\tau}\gamma +
              \frac{\alpha\Delta t{}^{\tau}\gamma
-             \left(^{\tau}\sigma_{11}^{dev}\right)^{2}\left(n-1\right)}
-             {^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+             \left(^{\tau}\sigma_{12}^{dev}\right)^{2}\left(n-1\right)}
+             {{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{1313} &= \frac{1}{2\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{13}^{dev}\right)^{2}\left(n-1\right)}
+             {{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,, \\
+  C_{2323} &= \frac{1}{2\left[\alpha\Delta t{}^{\tau}\gamma +
+             \frac{\alpha\Delta t{}^{\tau}\gamma
+             \left(^{\tau}\sigma_{23}^{dev}\right)^{2}\left(n-1\right)}
+             {{}^{\tau}J_{2}^{dev}} + \frac{1}{2\mu}\right]}\,. \\
 \end{align}
   
 % ----------------------------------------------------------------------

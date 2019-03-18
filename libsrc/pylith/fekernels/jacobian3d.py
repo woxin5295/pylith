@@ -262,14 +262,15 @@ writeJacobianInfo(fileName, jacobian)
 # ----------------------------------------------------------------------
 # Power-law viscoelastic.
 fileName = 'elasticity-powerlaw_iso3d.txt'
+fileName2 = 'elasticity-powerlaw_iso3d_2.txt'
 aT, n, alpha = sympy.symbols('aT n alpha')
 s11, s12, s13, s22, s23, s33 = sympy.symbols('s11 s12 s13 s22 s23 s33')
 s11T, s12T, s13T, s22T, s23T, s33T = sympy.symbols(
   's11T s12T s13T s22T s23T s33T')
 s11FTau, s12FTau, s13FTau, s22FTau, s23FTau, s33FTau = sympy.symbols(
   's11FTau s12FTau s13FTau s22FTau s23FTau s33FTau')
-j2FTplusDt, j2Ft, j2FTau, gammaFTau = sympy.symbols(
-  'j2FTplusDt j2Ft j2FTau gammaFTau')
+j2FTplusDt, j2FT, j2FTau, gammaFTau = sympy.symbols(
+  'j2FTplusDt j2FT j2FTau gammaFTau')
 meanStress = bulkModulus * volStrainArr
 devStress = sympy.Matrix([[s11, s12, s13],
                           [s12, s22, s23],
@@ -278,14 +279,18 @@ devStressT = sympy.Matrix([[s11T, s12T, s13T],
                            [s12T, s22T, s23T],
                            [s13T, s23T, s33T]])
 devStressTau = alpha*devStress + (one - alpha)*devStressT
-j2TplusDt = sympy.sqrt(innerProd(devStress, devStress))
-j2T = sympy.sqrt(innerProd(devStressT, devStressT))
-j2Tau = sympy.sqrt(innerProd(devStressTau, devStressTau))
+j2TplusDt = sympy.sqrt(innerProd(devStress, devStress)/two)
+j2T = sympy.sqrt(innerProd(devStressT, devStressT)/two)
+j2Tau = sympy.sqrt(innerProd(devStressTau, devStressTau)/two)
+j2Tau2 = alpha*j2TplusDt + (one - alpha)*j2T
 aE = one/(two*shearModulus)
 gammaTau = aT*(j2Tau)**(n-one)
+gammaTau2 = aT*(j2Tau2)**(n-one)
 F = aE*devStress + devStressTau*gammaTau*deltaT - devStrain
+F2 = devStress*(aE + alpha*deltaT*gammaTau2) + devStressT*gammaTau2*deltaT - devStrain
 
 dFdStress = sympy.derive_by_array(F, devStress)
+dFdStress2 = sympy.derive_by_array(F2, devStress)
 dFdStressSimp = dFdStress.subs([(gammaTau, gammaFTau),
                                 (j2Tau, j2FTau),
                                 (devStressTau[0], s11FTau),
@@ -294,10 +299,24 @@ dFdStressSimp = dFdStress.subs([(gammaTau, gammaFTau),
                                 (devStressTau[4], s22FTau),
                                 (devStressTau[5], s23FTau),
                                 (devStressTau[8], s33FTau)])
+dFdStressSimp2 = dFdStress2.subs([(gammaTau2, gammaFTau),
+                                  (j2Tau2, j2FTau),
+                                  (j2TplusDt, j2FTplusDt),
+                                  (j2T, j2FT),
+                                  (devStressTau[0], s11FTau),
+                                  (devStressTau[1], s12FTau),
+                                  (devStressTau[2], s13FTau),
+                                  (devStressTau[4], s22FTau),
+                                  (devStressTau[5], s23FTau),
+                                  (devStressTau[8], s33FTau)])
 
 dFdStrain = -sympy.derive_by_array(F, defGrad)
+dFdStrain2 = -sympy.derive_by_array(F2, defGrad)
 
 jacobianDev = divideTensors(dFdStrain, dFdStressSimp)
 jacobianVol = sympy.derive_by_array(meanStress, defGrad)
 jacobian = jacobianDev + jacobianVol
+jacobianDev2 = divideTensors(dFdStrain2, dFdStressSimp2)
+jacobian2 = jacobianDev2 + jacobianVol
 writeJacobianInfo(fileName, jacobian)
+writeJacobianInfo(fileName2, jacobian2)
