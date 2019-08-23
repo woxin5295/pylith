@@ -102,7 +102,11 @@ pylith::topology::FieldOps::createFE(const FieldBase::Discretization& feinfo,
     err = PetscQuadratureDestroy(&quadrature);PYLITH_CHECK_ERROR(err);
     if (feinfo.feSpace == FieldBase::POLYNOMIAL_SPACE) {
         PetscQuadrature faceQuadrature = NULL;
-        err = PetscDTGaussJacobiQuadrature(dim-1, basisNumComponents, numPoints, xRefMin, xRefMax, &faceQuadrature);PYLITH_CHECK_ERROR(err);
+        if (isSimplex) {
+          err = PetscDTGaussJacobiQuadrature(dim-1, basisNumComponents, numPoints, xRefMin, xRefMax, &faceQuadrature);PYLITH_CHECK_ERROR(err);
+        } else {
+          err = PetscDTGaussTensorQuadrature(dim-1, basisNumComponents, numPoints, xRefMin, xRefMax, &faceQuadrature);PYLITH_CHECK_ERROR(err);          
+        }
         err = PetscFESetFaceQuadrature(fe, faceQuadrature);PYLITH_CHECK_ERROR(err);
         err = PetscQuadratureDestroy(&faceQuadrature);PYLITH_CHECK_ERROR(err);
     } else {
