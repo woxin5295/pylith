@@ -33,7 +33,7 @@ test_materials_SOURCES = \
 	TestAuxiliaryFactoryElastic.cc \
 	TestAuxiliaryFactoryElastic_Cases.cc \
 	TestMaterial.cc \
-	test_driver.cc
+	test_materials.cc
 
 
 noinst_HEADERS = \

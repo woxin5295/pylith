@@ -176,6 +176,7 @@ if ENABLE_TESTING
 libpylith_la_SOURCES += \
 	testing/StubMethodTracker.cc \
 	testing/FieldTester.cc \
+	testing/MaterialStub.cc \
 	testing/PhysicsStub.cc \
 	testing/PhysicsImplementationStub.cc \
 	testing/ProgressMonitorStub.cc \

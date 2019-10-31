@@ -33,20 +33,14 @@
 // Material -------------------------------------------------------------
 /** @brief C++ abstract base class for materials.
  *
- * Interface definition for a material. A material encapsulates both
- * the rheology as well as the governing equation.
+ * Interface definition for a material. The material corresponds to the governing equation for a domain. The rheology is
+ * a component of a material.
  *
- * An individual material must abide by specific rules for the
- * interface, especially the order of the fields in the solution.
- *
- * Elasticity:
- *   + displacement, [velocity, Lagrange multipliers]
- *
- * Incompressible elasticity
- *   + displacement, pressure, [velocity, Lagrange multipliers]
+ * An individual material must abide by specific rules for the interface, especially the order of the subfields in the
+ * solution.
  */
 
-class pylith::materials::Material : public pylith::problems::Physics {
+class pylith::materials::Material : public virtual pylith::problems::Physics {
     friend class TestMaterial; // unit testing
 
     // PUBLIC METHODS //////////////////////////////////////////////////////////////////////////////////////////////////

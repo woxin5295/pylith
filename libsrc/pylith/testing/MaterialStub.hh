@@ -29,10 +29,10 @@
 
 #include "pylith/testing/testingfwd.hh" // forward declarations
 
+#include "pylith/materials/Material.hh" // ISA Material
 #include "pylith/testing/PhysicsStub.hh" // ISA PhysicsStub
 
-class pylith::material::MaterialStub : public pylith::problems::PhysicsStub {
-
+class pylith::materials::MaterialStub : public pylith::problems::PhysicsStub, public pylith::materials::Material  {
     // PUBLIC METHODS //////////////////////////////////////////////////////////////////////////////////////////////////
 public:
 
@@ -41,6 +41,16 @@ public:
 
     /// Destructor
     ~MaterialStub(void);
+
+    /// Deallocate PETSc and local data structures.
+    void deallocate(void);
+
+    /** Create constraint and set kernels.
+     *
+     * @param[in] solution Solution field.
+     * @returns Constraint if applicable, otherwise NULL.
+     */
+    pylith::feassemble::Constraint* createConstraint(const pylith::topology::Field& solution);
 
     // NOT IMPLEMENTED /////////////////////////////////////////////////////////////////////////////////////////////////
 private:
@@ -51,6 +61,5 @@ private:
 }; // MaterialStub
 
 #endif // pylith_materials_materialstub_hh
-
 
 // End of file

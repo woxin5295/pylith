@@ -17,9 +17,9 @@
 //
 
 /**
- * @file tests/libtests/materials/TestMaterial.hh
+ * @file unittests/libtests/materials/TestMaterial.hh
  *
- * @brief C++ object for testing Material objects.
+ * @brief C++ abstract base class for testing material objects.
  */
 
 #if !defined(pylith_materials_testmaterial_hh)
@@ -36,12 +36,14 @@
 #include "spatialdata/geocoords/geocoordsfwd.hh" // HOLDSA CoordSys
 #include "spatialdata/units/unitsfwd.hh" // HOLDSA Nondimensional
 
+/// Namespace for pylith package
 namespace pylith {
     namespace materials {
         class TestMaterial;
     } // materials
 } // pylith
 
+/// C++ abstract base class for testing material objects.
 class pylith::materials::TestMaterial : public CppUnit::TestFixture, public pylith::utils::GenericComponent {
     // CPPUNIT TEST SUITE /////////////////////////////////////////////////
     CPPUNIT_TEST_SUITE(TestMaterial);
@@ -54,7 +56,7 @@ class pylith::materials::TestMaterial : public CppUnit::TestFixture, public pyli
     // PUBLIC METHODS /////////////////////////////////////////////////////
 public:
 
-    /// Test accessors.
+    /// Test set/getMaterialId(), set/getDescriptiveLabel(), setGravityField().
     void testAccessors(void);
 
     /// Test createConstraint().

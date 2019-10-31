@@ -22,14 +22,35 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Constructor.
-pylith::material::MaterialStub::MaterialStub(void) {}
+pylith::materials::MaterialStub::MaterialStub(void) {}
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Destructor
-pylith::material::MaterialStub::~MaterialStub(void) {
+pylith::materials::MaterialStub::~MaterialStub(void) {
     deallocate();
 } // destructor
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Deallocate PETSc and local data structures.
+void
+pylith::materials::MaterialStub::deallocate(void) {
+    PYLITH_METHOD_BEGIN;
+
+    pylith::problems::PhysicsStub::deallocate();
+    pylith::materials::Material::deallocate();
+
+    PYLITH_METHOD_END;
+} // deallocate
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Create constraint and set kernels.
+pylith::feassemble::Constraint*
+pylith::materials::MaterialStub::createConstraint(const pylith::topology::Field& solution) {
+    return pylith::materials::Material::createConstraint(solution);
+} // createConstraint
 
 
 // End of file

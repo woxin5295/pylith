@@ -30,7 +30,7 @@
 
 #include "pylith/problems/Physics.hh" // ISA Physics
 
-class pylith::problems::PhysicsStub : public pylith::problems::Physics {
+class pylith::problems::PhysicsStub : public virtual pylith::problems::Physics {
     friend class TestPhysicsStub; // unit testing
 
     // PUBLIC METHODS //////////////////////////////////////////////////////////////////////////////////////////////////
