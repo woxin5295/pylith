@@ -43,6 +43,10 @@ namespace pylith {
         class PhysicsImplementationStub;
     } // feassemble
 
+    namespace materials {
+        class MaterialStub;
+    } // material
+
     namespace problems {
         class PhysicsStub;
         class ObserverSolnStub;
