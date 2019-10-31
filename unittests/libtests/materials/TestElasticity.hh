@@ -17,7 +17,7 @@
 //
 
 /**
- * @file unittests/libtests/materials/TestMaterial.hh
+ * @file unittests/libtests/materials/TestElasticity.hh
  *
  * @brief C++ class for testing material objects.
  */
@@ -30,38 +30,45 @@
 
 #include "pylith/materials/materialsfwd.hh" // forward declarations
 #include "pylith/topology/topologyfwd.hh" // forward declarations
-#include "pylith/topology/Field.hh" // HASA FieldBase::Discretization
-
-#include "spatialdata/spatialdb/spatialdbfwd.hh" // HOLDSA UserFunctionDB
-#include "spatialdata/geocoords/geocoordsfwd.hh" // HOLDSA CoordSys
-#include "spatialdata/units/unitsfwd.hh" // HOLDSA Nondimensional
 
 /// Namespace for pylith package
 namespace pylith {
     namespace materials {
-        class TestMaterial;
+        class TestElasticity;
     } // materials
 } // pylith
 
-class pylith::materials::TestMaterial : public CppUnit::TestFixture, public pylith::utils::GenericComponent {
+class pylith::materials::TestElasticity : public CppUnit::TestFixture, public pylith::utils::GenericComponent {
     // CPPUNIT TEST SUITE /////////////////////////////////////////////////
-    CPPUNIT_TEST_SUITE(TestMaterial);
+    CPPUNIT_TEST_SUITE(TestElasticity);
 
     CPPUNIT_TEST(testAccessors);
-    CPPUNIT_TEST(testCreateConstraint);
+    CPPUNIT_TEST(testVerifyConfiguration);
+    CPPUNIT_TEST(testCreateIntegrator);
+    CPPUNIT_TEST(testCreateAuxiliaryField);
+    CPPUNIT_TEST(testCreateDerivedField);
 
     CPPUNIT_TEST_SUITE_END();
 
     // PUBLIC METHODS /////////////////////////////////////////////////////
 public:
 
-    /// Test set/getMaterialId(), set/getDescriptiveLabel(), setGravityField().
+    /// Test getters/setters.
     void testAccessors(void);
 
-    /// Test createConstraint().
-    void testCreateConstraint(void);
+    /// Test verifyConfiguration().
+    void testVerifyConfiguration(void);
 
-}; // class TestMaterial
+    /// Test createIntegrator().
+    void testCreateIntegrator(void);
+
+    /// Test createAuxiliaryField().
+    void testCreateAuxiliaryField(void);
+
+    /// Test createDerivedField().
+    void testCreateDerivedField(void);
+
+}; // class TestElasticity
 
 #endif // pylith_materials_testmaterial_hh
 
