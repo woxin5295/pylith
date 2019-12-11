@@ -16,22 +16,22 @@
 // ----------------------------------------------------------------------
 //
 
-/** @file modulesrc/materials/Elasticity.i
+/** @file modulesrc/materials/Poroelasticity.i
  *
- * Python interface to C++ Elasticity.
+ * Python interface to C++ Poroelasticity.
  */
 
 namespace pylith {
     namespace materials {
-        class Elasticity : public pylith::materials::Material {
+        class Poroelasticity : public pylith::materials::Material {
             // PUBLIC METHODS //////////////////////////////////////////////////////////////////////////////////////////
 public:
 
             /// Default constructor.
-            Elasticity(void);
+            Poroelasticity(void);
 
             /// Destructor.
-            ~Elasticity(void);
+            ~Poroelasticity(void);
 
             /// Deallocate PETSc and local data structures.
             void deallocate(void);
@@ -62,15 +62,15 @@ public:
 
             /** Set bulk rheology.
              *
-             * @param[in] rheology Bulk rheology for elasticity.
+             * @param[in] rheology Bulk rheology for poroelasticity.
              */
-            void setBulkRheology(pylith::materials::RheologyElasticity* const rheology);
+            void setBulkRheology(pylith::materials::RheologyPoroelasticity* const rheology);
 
             /** Get bulk rheology.
              *
-             * @returns Bulk rheology for elasticity.
+             * @returns Bulk rheology for poroelasticity.
              */
-            pylith::materials::RheologyElasticity* getBulkRheology(void) const;
+            pylith::materials::RheologyPoroelasticity* getBulkRheology(void) const;
 
             /** Verify configuration is acceptable.
              *
@@ -121,7 +121,7 @@ protected:
              */
             void _updateKernelConstants(const PylithReal dt);
 
-        }; // class Elasticity
+        }; // class Poroelasticity
 
     } // materials
 } // pylith
